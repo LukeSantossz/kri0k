@@ -19,10 +19,10 @@ use std::collections::HashMap;
 pub struct Scope {
     /// Authorized target networks/hosts (CIDR notation).
     pub targets: Vec<String>,
-    
+
     /// Operator identification (M-42).
     pub operator: String,
-    
+
     /// Additional metadata.
     pub metadata: HashMap<String, String>,
 }
@@ -32,13 +32,15 @@ impl Scope {
     ///
     /// # Errors
     /// Returns error if scope.yaml is missing or invalid (M-01).
+    #[allow(clippy::todo)]
     pub fn from_yaml(_path: &str) -> Result<Self, crate::Error> {
         // TODO(T7/M-01): Implement YAML parsing
         todo!("Scope::from_yaml not implemented (T7/M-01)")
     }
-    
+
     /// Compute SHA256 hash of the scope definition (M-03).
     #[must_use]
+    #[allow(clippy::todo)]
     pub fn compute_hash(&self) -> String {
         // TODO(T7/M-03): Implement scope hashing
         todo!("Scope::compute_hash not implemented (T7/M-03)")
@@ -72,10 +74,11 @@ mod tests {
             operator: "test@example.com".to_string(),
             metadata: HashMap::new(),
         };
-        
+
         // Should return error until implemented
         let result = validate_target(&scope, "192.168.1.10");
-        assert!(result.is_err());
-        assert!(result.unwrap_err().to_string().contains("not implemented"));
+        assert!(
+            matches!(result, Err(crate::Error::Generic(ref s)) if s.contains("not implemented"))
+        );
     }
 }

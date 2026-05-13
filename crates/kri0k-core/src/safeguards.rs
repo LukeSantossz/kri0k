@@ -32,7 +32,7 @@ impl Default for SafeguardsConfig {
 impl SafeguardsConfig {
     /// Check if execution is allowed under current safeguards.
     #[must_use]
-    pub fn allows_execution(&self) -> bool {
+    pub const fn allows_execution(&self) -> bool {
         !self.propose_only && !self.kill_switch_active
     }
 
@@ -62,8 +62,10 @@ mod tests {
 
     #[test]
     fn test_kill_switch() {
-        let mut config = SafeguardsConfig::default();
-        config.propose_only = false;
+        let mut config = SafeguardsConfig {
+            propose_only: false,
+            ..Default::default()
+        };
 
         assert!(config.allows_execution());
 

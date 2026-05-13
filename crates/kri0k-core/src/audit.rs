@@ -19,15 +19,27 @@ use std::path::Path;
 /// engagement lifecycle) must be logged through this trait (M-13).
 pub trait AuditSink: Send + Sync {
     /// Log a TTP execution event.
+    ///
+    /// # Errors
+    /// Returns error if logging fails.
     fn log_ttp_execution(&mut self, event: TtpExecutionEvent) -> Result<(), crate::Error>;
 
     /// Log a scope violation attempt (M-21).
+    ///
+    /// # Errors
+    /// Returns error if logging fails.
     fn log_scope_violation(&mut self, event: ScopeViolationEvent) -> Result<(), crate::Error>;
 
     /// Log an engagement lifecycle event (boot, kill, archive).
+    ///
+    /// # Errors
+    /// Returns error if logging fails.
     fn log_engagement(&mut self, event: EngagementEvent) -> Result<(), crate::Error>;
 
     /// Finalize and flush audit log.
+    ///
+    /// # Errors
+    /// Returns error if flush fails.
     fn flush(&mut self) -> Result<(), crate::Error>;
 }
 
