@@ -3,6 +3,16 @@
 use serde::{Deserialize, Serialize};
 use std::fmt;
 
+// T7 security safeguards stubs
+/// Audit logging (M-12..M-22, ADR-0007).
+pub mod audit;
+/// Runtime safeguards configuration (M-05, M-36).
+pub mod safeguards;
+/// Scope validation (M-01..M-04, ADR-0011).
+pub mod scope;
+/// TTP trait and execution flow (M-05, M-15, M-34..M-36, ADR-0012).
+pub mod ttp;
+
 /// Common error type for kri0k operations.
 #[derive(Debug, thiserror::Error)]
 pub enum Error {

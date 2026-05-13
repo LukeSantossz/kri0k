@@ -1,0 +1,30 @@
+# Example scope configuration for Kri0K engagements
+# See: docs/security/THREAT_MODEL.md §2.1 (M-01..M-04)
+# ADR: docs/adr/ADR-0011 (scope validation)
+
+# Operator identification (M-42, M-43)
+operator: operator@example.com
+
+# Authorized target networks/hosts (CIDR notation)
+# M-01: scope.yaml is mandatory at boot
+# M-02: All targets are validated against this list before TTP execution
+targets:
+  - 192.168.1.0/24
+  - 10.0.0.0/16
+  # - example.com  # DNS names will be expanded to IPs during validation
+
+# Optional: Excluded ranges within target networks
+excluded:
+  - 192.168.1.1  # Gateway
+  - 192.168.1.254  # DNS server
+
+# Optional: Engagement metadata
+metadata:
+  engagement_id: ENGAGE-2026-001
+  client: Example Corp
+  start_date: "2026-05-01"
+  end_date: "2026-05-31"
+  authorized_by: security-team@example.com
+
+# M-03: scope_hash (SHA256 of this file) will be embedded in all Snapshots
+# M-04: Fields above are non-bypassable (enforced by validator)
