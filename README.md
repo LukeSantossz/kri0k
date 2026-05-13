@@ -3,61 +3,97 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Build Status](https://img.shields.io/badge/build-TBD-lightgrey)]()
 
-> ⚠️ **DISCLAIMER**: This tool is intended EXCLUSIVELY for use in controlled laboratory environments, isolated virtual machines, authorized penetration testing engagements, and CTF competitions. Use in unauthorized networks or production environments is strictly prohibited and may be illegal. Users are solely responsible for ensuring they have explicit authorization before running this software.
+> ⚠️ **DISCLAIMER**: Esta ferramenta é destinada EXCLUSIVAMENTE para uso em ambientes de laboratório controlados, máquinas virtuais isoladas, testes de penetração autorizados e competições CTF. O uso em redes não autorizadas ou ambientes de produção é estritamente proibido e pode ser ilegal. Os usuários são os únicos responsáveis por garantir que possuem autorização explícita antes de executar este software.
 
-## O quê
+## O que isso faz?
 
-O Kri0K (KRK-001) é um orquestrador autônomo de kill chain para red team, construído sobre um núcleo assíncrono em Rust com uma camada de raciocínio em Python via LangGraph. O sistema mantém um grafo de estado de ataque tipado e persistente — serializado e fornecido como contexto ao LLM a cada iteração do loop de raciocínio — eliminando a dependência exclusiva do histórico de mensagens para manter coerência tática entre etapas.
+Orquestrador autônomo de kill-chains para red team com raciocínio baseado em grafo de estado persistente.
 
-A saída do sistema é mapeada para TTPs do framework MITRE ATT\&CK, permitindo rastreabilidade formal de cada ação executada pelo agente dentro da cadeia de ataque.
+**Funcionalidades planejadas:**
+
+- Orquestração autônoma de kill-chains sem intervenção manual entre etapas
+- Grafo de estado de ataque tipado e persistente (serializado como contexto para o LLM)
+- Mapeamento automático de ações para TTPs do framework MITRE ATT&CK
+- Loop de raciocínio via LangGraph sobre o estado acumulado do ataque
+- Módulos de reconhecimento com hickory-dns
+- Persistência de estado entre sessões para cadeia de ataque contínua
+
+## O que é?
+
+Biblioteca Rust com CLI e camada de raciocínio em Python via LangGraph. Não é aplicação web, desktop ou mobile — é uma ferramenta de linha de comando para pesquisa em segurança ofensiva.
+
+O núcleo assíncrono em Rust mantém o grafo de estado e executa operações de rede/sistema; a camada Python (LangGraph) raciocina sobre o grafo serializado e decide próximas etapas táticas.
+
+## Quais tecnologias são usadas?
+
+| Camada | Tecnologias |
+|--------|-------------|
+| Núcleo assíncrono | Rust (Tokio, petgraph, hickory-dns) |
+| Interoperabilidade | PyO3 (Rust ↔ Python) |
+| Raciocínio / Orquestração | Python (LangGraph) |
+| Framework tático | MITRE ATT&CK |
+
+**Stack principal:** Rust + Python via PyO3, com LangGraph para o loop de decisão baseado em estado.
+
+## Qual é a ambição?
+
+Ferramenta de pesquisa para red teamers, CTFs e laboratórios de segurança ofensiva autorizados. **Não é produto comercial** nem destinado a redes não autorizadas.
+
+A ambição é explorar orquestração de ataques com um **grafo de estado persistente** que elimina a dependência exclusiva do histórico de mensagens do LLM — permitindo raciocínio sobre o contexto completo do ataque acumulado, não apenas sobre o último comando executado. Isso reduz fricção operacional e aumenta a profundidade das cadeias exploradas de forma autônoma.
+
+## Qual é o estágio?
+
+**Status: MVP-0 em desenvolvimento**
+
+| Estágio | Status | Descrição |
+|---------|--------|-----------|
+| **MVP-0** | ✅ Em andamento | Scaffold Rust+Python, estrutura do repositório, interop PyO3 base |
+| **MVP-1** | ⏳ Pendente | Agente LangGraph operando sobre o grafo serializado, mapeamento ATT&CK |
+| **Visão completa** | ⏳ Pendente | Persistência de estado entre sessões, módulos recon hickory-dns, expansão de TTPs |
+
+**O que está pronto:**
+
+- Repositório público configurado (MIT License, .gitignore Rust+Python)
+- Scaffold do núcleo Rust (Tokio runtime, petgraph para grafo de estado)
+- Estrutura PyO3 para interoperabilidade Rust/Python
+- README com DISCLAIMER de uso responsável e badges
+
+**O que está pendente:**
+
+- Implementação do agente LangGraph (MVP-1)
+- Serialização do grafo de estado e injeção no prompt do LLM
+- Mapeamento de saídas para MITRE ATT&CK
+- Módulos de reconhecimento via hickory-dns
+- Persistência de estado entre sessões
+- Testes cross-language (Rust ↔ Python)
+
+## Problemas conhecidos / limitações
+
+**Restrições de escopo:**
+
+- ⚠️ **APENAS para ambientes autorizados:** labs, VMs isoladas, CTFs. **NÃO** usar em produção ou redes sem autorização explícita.
+- ⚠️ **Ferramenta dual-use:** O software pode ser usado tanto para defesa (red team em exercícios autorizados) quanto para fins maliciosos. Uso inadequado é responsabilidade exclusiva do operador.
+
+**Limitações técnicas:**
+
+- **Interop Rust↔Python via PyO3:** Ainda não validada sob carga. Possíveis gargalos de serialização/deserialização em grafos grandes.
+- **Ausência de testes cross-language:** A integração entre camadas Rust e Python ainda não possui suíte de testes end-to-end.
+- **Performance do grafo:** petgraph funciona bem para grafos médios, mas escalabilidade ainda não foi testada para kill-chains muito longas.
+
+**Roadmap:**
+
+1. Validar interop PyO3 com benchmarks de carga
+2. Implementar suite de testes Rust+Python integrada
+3. Adicionar limitações de profundidade/tempo para evitar loops infinitos no agente
+4. Documentar práticas de uso responsável e checklists de autorização pré-execução
 
 ---
 
-## Pra quem
+## Inspirações
 
-Red teamers, pesquisadores de segurança ofensiva e equipes de CTF que operam em ambientes de laboratório controlado, VMs isoladas ou competições. O sistema não é destinado a ambientes de produção ou redes não autorizadas.
-
----
-
-## Por quê
-
-Ferramentas de red team existentes exigem intervenção humana constante para encadear etapas táticas. O Kri0K resolve a ausência de um orquestrador que raciocine sobre o estado acumulado do ataque — não apenas sobre o último comando executado — e tome decisões de próximo passo com base no grafo completo, reduzindo fricção operacional e aumentando a profundidade das cadeias exploradas.
-
----
-
-## MVP vs. Visão Completa
-
-|Escopo|Conteúdo|
-|-|-|
-|**MVP-0**|Scaffolding do núcleo Rust com runtime Tokio, integração PyO3 para interop com Python, estrutura base do grafo com petgraph.|
-|**MVP-1**|Agente LangGraph operando sobre o grafo serializado com mapeamento de saída para ATT\&CK.|
-|**Visão completa**|Persistência de estado entre sessões, módulos de reconhecimento via hickory-dns, expansão do catálogo de TTPs cobertos pelo agente.|
-
----
-
-## Restrições
-
-* **Stack obrigatória:** Rust (Tokio, hickory-dns, PyO3, petgraph) e Python (LangGraph).
-* **Escopo de execução:** Restrito a ambientes isolados — lab, VM, CTF. Sem suporte a redes não autorizadas.
-* **Infraestrutura:** Sem dependência de cloud para execução do núcleo.
-* **Restrição arquitetural:** Interop Rust/Python via PyO3 é não negociável.
-
----
-
-## Inspirações e Referências
-
-* Arquiteturas de agentes com grafo de estado persistente (LangGraph nativo).
-* Frameworks de red team: Metasploit, CALDERA.
-* Modelo de raciocínio sobre estado acumulado presente em sistemas de planejamento autônomo.
-* MITRE ATT\&CK como estrutura taxonômica de referência.
-
----
-
-## O que já existe
-
-Pura ideação por hora
-
----
+- Arquiteturas de agentes com grafo de estado persistente (LangGraph)
+- Frameworks de red team: Metasploit, CALDERA
+- MITRE ATT&CK como estrutura taxonômica de referência
 
 ## License
 
