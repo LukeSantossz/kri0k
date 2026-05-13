@@ -26,26 +26,28 @@ missing_debug_implementations = "warn"
 missing_docs = "warn"
 
 [workspace.lints.clippy]
-correctness = "deny"
-suspicious = "deny"
-perf = "deny"
-complexity = "warn"
-style = "warn"
-pedantic = "warn"
-nursery = "warn"
+# Lint groups have lower priority so individual lints can override
+correctness = { level = "deny", priority = -1 }
+suspicious = { level = "deny", priority = -1 }
+perf = { level = "deny", priority = -1 }
+complexity = { level = "warn", priority = -1 }
+style = { level = "warn", priority = -1 }
+pedantic = { level = "warn", priority = -1 }
+nursery = { level = "warn", priority = -1 }
 
+# Specific overrides
 module_name_repetitions = "allow"
 similar_names = "allow"
 too_many_arguments = "allow"
 missing_errors_doc = "warn"
 missing_panics_doc = "warn"
 
+# Security-critical denies
 unwrap_used = "deny"
 expect_used = "warn"
 panic = "deny"
 unimplemented = "deny"
 todo = "warn"
-unsafe_code = "warn"
 cognitive_complexity = "warn"
 
 [profile.dev]

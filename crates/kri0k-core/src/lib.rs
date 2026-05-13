@@ -79,6 +79,7 @@ impl fmt::Display for EdgeId {
 }
 
 #[cfg(test)]
+#[allow(clippy::expect_used)] // expect is ok in tests
 mod tests {
     use super::*;
 

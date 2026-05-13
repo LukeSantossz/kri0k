@@ -10,13 +10,27 @@ use std::collections::HashMap;
 #[serde(tag = "type", rename_all = "snake_case")]
 pub enum NodeKind {
     /// Target host node.
-    Host { ip: String },
+    Host {
+        /// IP address of the host.
+        ip: String,
+    },
     /// Network segment.
-    Network { cidr: String },
+    Network {
+        /// CIDR notation for the network.
+        cidr: String,
+    },
     /// Service endpoint.
-    Service { port: u16, protocol: String },
+    Service {
+        /// Port number.
+        port: u16,
+        /// Protocol name (e.g., "tcp", "udp").
+        protocol: String,
+    },
     /// Discovery finding.
-    Finding { description: String },
+    Finding {
+        /// Human-readable description.
+        description: String,
+    },
 }
 
 /// Edge kind enumeration.
@@ -28,7 +42,10 @@ pub enum EdgeKind {
     /// Service runs on host.
     RunsOn,
     /// Finding related to node.
-    RelatesTo { relation: String },
+    RelatesTo {
+        /// Type of relationship.
+        relation: String,
+    },
 }
 
 /// Node in the graph.
@@ -81,11 +98,11 @@ impl Edge {
     }
 }
 
-/// Graph wrapper around petgraph StableGraph.
+/// Graph wrapper around petgraph `StableGraph`.
 #[derive(Debug)]
 pub struct Graph {
     inner: StableGraph<Node, Edge>,
-    /// Map from external NodeId to internal NodeIndex.
+    /// Map from external `NodeId` to internal `NodeIndex`.
     node_map: HashMap<NodeId, NodeIndex>,
 }
 
@@ -180,6 +197,7 @@ impl Default for Graph {
 }
 
 #[cfg(test)]
+#[allow(clippy::expect_used)] // expect is ok in tests
 mod tests {
     use super::*;
 

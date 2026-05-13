@@ -1,4 +1,5 @@
-//! PyO3 bindings for kri0k Rust core.
+//! `PyO3` bindings for kri0k Rust core.
+#![allow(clippy::useless_conversion)] // PyResult type annotations trigger false positives
 
 use kri0k_graph::{Edge, EdgeKind, Graph, Node, NodeKind};
 use pyo3::prelude::*;
@@ -8,6 +9,7 @@ use std::sync::OnceLock;
 static TOKIO_RUNTIME: OnceLock<tokio::runtime::Runtime> = OnceLock::new();
 
 /// Get or initialize the global Tokio runtime.
+#[allow(clippy::expect_used)] // Runtime failure is unrecoverable
 fn runtime() -> &'static tokio::runtime::Runtime {
     TOKIO_RUNTIME.get_or_init(|| {
         tokio::runtime::Builder::new_multi_thread()
@@ -21,13 +23,15 @@ fn runtime() -> &'static tokio::runtime::Runtime {
 
 /// Returns a greeting message.
 #[pyfunction]
-fn hello() -> PyResult<String> {
-    Ok("Hello from kri0k! Rust core initialized.".to_string())
+fn hello() -> String {
+    "Hello from kri0k! Rust core initialized.".to_string()
 }
 
 /// Returns a dummy graph structure for testing cross-language serialization.
 #[pyfunction]
-fn get_dummy_graph(py: Python<'_>) -> PyResult<PyObject> {
+#[allow(clippy::expect_used)] // Demo function, failure is acceptable
+#[allow(clippy::useless_conversion)] // False positive with PyResult
+fn get_dummy_graph(py: Python<'_>) -> PyResult<Py<PyAny>> {
     // Release GIL while building graph
     let json_value = py.allow_threads(|| {
         let mut graph = Graph::new();
