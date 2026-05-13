@@ -1,0 +1,47 @@
+# KRK-001 Kri0K — Rustfmt configuration
+# Enforced via CI and pre-commit hooks
+
+# Edition and MSRV
+edition = "2021"
+
+# Formatting options
+max_width = 100
+hard_tabs = false
+tab_spaces = 4
+
+# Imports
+imports_granularity = "Crate"
+group_imports = "StdExternalCrate"
+reorder_imports = true
+
+# Code style
+use_small_heuristics = "Default"
+fn_single_line = false
+where_single_line = false
+force_explicit_abi = true
+
+# Comments and documentation
+wrap_comments = true
+format_code_in_doc_comments = true
+normalize_comments = true
+normalize_doc_attributes = true
+
+# Strings
+format_strings = true
+
+# Macros
+format_macro_matchers = true
+format_macro_bodies = true
+
+# Trailing
+trailing_semicolon = true
+trailing_comma = "Vertical"
+
+# Match blocks
+match_block_trailing_comma = true
+
+# Use field init shorthand
+use_field_init_shorthand = true
+
+# Chains
+chain_width = 60

@@ -1,0 +1,20 @@
+[package]
+name = "kri0k-pybridge"
+version = "0.1.0"
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+
+[lib]
+name = "kri0k_native"
+crate-type = ["cdylib"]
+
+[lints]
+workspace = true
+
+[dependencies]
+kri0k-core = { path = "../kri0k-core" }
+kri0k-graph = { path = "../kri0k-graph" }
+pyo3.workspace = true
+tokio.workspace = true
+serde_json.workspace = true

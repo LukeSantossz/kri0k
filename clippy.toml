@@ -1,0 +1,48 @@
+# KRK-001 Kri0K — Clippy configuration
+# Enforced via CI with -D warnings (deny all warnings)
+
+# Deny all warnings in CI
+# Run with: cargo clippy --all-targets --all-features -- -D warnings
+
+# Lints to deny (errors)
+[lints.clippy]
+# Correctness (always deny)
+correctness = "deny"
+
+# Suspicious patterns
+suspicious = "deny"
+
+# Performance
+perf = "deny"
+
+# Complexity
+complexity = "warn"
+
+# Style (enforce consistency)
+style = "warn"
+
+# Pedantic (opt-in for new code quality)
+pedantic = "warn"
+
+# Nursery (experimental, warn only)
+nursery = "warn"
+
+# Specific allows (exceptions to pedantic/nursery)
+module-name-repetitions = "allow"        # Common pattern in Rust
+similar-names = "allow"                  # Sometimes unavoidable
+too-many-arguments = "allow"             # Builder pattern handles this
+missing-errors-doc = "warn"              # Should document errors
+missing-panics-doc = "warn"              # Should document panics
+
+# Security-critical denies
+unwrap-used = "deny"                     # Use expect or proper error handling
+expect-used = "warn"                     # Prefer proper error handling
+panic = "deny"                           # No panics in production code
+unimplemented = "deny"                   # No unimplemented in shipped code
+todo = "warn"                            # Track TODOs
+
+# Unsafe code
+unsafe-code = "warn"                     # Require justification for unsafe
+
+# Cognitive complexity limits
+cognitive-complexity = "warn"

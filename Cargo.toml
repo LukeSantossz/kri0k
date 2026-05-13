@@ -1,0 +1,59 @@
+[workspace]
+resolver = "2"
+members = [
+    "crates/kri0k-core",
+    "crates/kri0k-graph", 
+    "crates/kri0k-pybridge",
+]
+
+[workspace.package]
+rust-version = "1.75.0"
+edition = "2021"
+license = "TBD"
+
+[workspace.dependencies]
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+thiserror = "1.0"
+tokio = { version = "1.40", features = ["rt", "rt-multi-thread", "macros"] }
+pyo3 = { version = "0.22", features = ["extension-module"] }
+petgraph = { version = "0.6", features = ["serde-1"] }
+ulid = { version = "1.1", features = ["serde"] }
+
+[workspace.lints.rust]
+unsafe_code = "warn"
+missing_debug_implementations = "warn"
+missing_docs = "warn"
+
+[workspace.lints.clippy]
+correctness = "deny"
+suspicious = "deny"
+perf = "deny"
+complexity = "warn"
+style = "warn"
+pedantic = "warn"
+nursery = "warn"
+
+module_name_repetitions = "allow"
+similar_names = "allow"
+too_many_arguments = "allow"
+missing_errors_doc = "warn"
+missing_panics_doc = "warn"
+
+unwrap_used = "deny"
+expect_used = "warn"
+panic = "deny"
+unimplemented = "deny"
+todo = "warn"
+unsafe_code = "warn"
+cognitive_complexity = "warn"
+
+[profile.dev]
+opt-level = 0
+debug = true
+
+[profile.release]
+opt-level = 3
+lto = "thin"
+codegen-units = 1
+strip = "symbols"

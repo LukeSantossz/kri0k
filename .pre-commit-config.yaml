@@ -1,0 +1,124 @@
+# KRK-001 Kri0K — Pre-commit hooks
+# Install: pip install pre-commit && pre-commit install
+# Run manually: pre-commit run --all-files
+
+repos:
+  # Rust formatting
+  - repo: local
+    hooks:
+      - id: cargo-fmt
+        name: cargo fmt
+        entry: cargo fmt --all --
+        language: system
+        types: [rust]
+        pass_filenames: false
+        description: "Format Rust code with rustfmt"
+
+  # Rust linting
+  - repo: local
+    hooks:
+      - id: cargo-clippy
+        name: cargo clippy
+        entry: cargo clippy --all-targets --all-features -- -D warnings
+        language: system
+        types: [rust]
+        pass_filenames: false
+        description: "Lint Rust code with clippy (deny warnings)"
+
+  # Rust tests (unit only in pre-commit, fast feedback)
+  - repo: local
+    hooks:
+      - id: cargo-test-unit
+        name: cargo test (unit)
+        entry: cargo test --lib --all-features
+        language: system
+        types: [rust]
+        pass_filenames: false
+        description: "Run Rust unit tests"
+
+  # Python formatting with ruff
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.8.4  # Update to latest stable version
+    hooks:
+      - id: ruff
+        name: ruff lint
+        args: [--fix, --exit-non-zero-on-fix]
+        types_or: [python, pyi]
+        description: "Lint Python code with ruff (auto-fix)"
+      
+      - id: ruff-format
+        name: ruff format
+        types_or: [python, pyi]
+        description: "Format Python code with ruff"
+
+  # Python type checking
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.11.2  # Update to latest stable version
+    hooks:
+      - id: mypy
+        name: mypy
+        args: [--strict, --no-error-summary]
+        additional_dependencies: []
+        types: [python]
+        description: "Static type check with mypy (strict mode)"
+
+  # Python tests (unit only in pre-commit)
+  - repo: local
+    hooks:
+      - id: pytest-unit
+        name: pytest (unit)
+        entry: pytest -m unit -x
+        language: system
+        types: [python]
+        pass_filenames: false
+        description: "Run Python unit tests"
+
+  # General file checks
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.6.0
+    hooks:
+      - id: trailing-whitespace
+        name: trim trailing whitespace
+        description: "Remove trailing whitespace"
+      
+      - id: end-of-file-fixer
+        name: fix end of files
+        description: "Ensure files end with newline"
+      
+      - id: check-yaml
+        name: check yaml
+        description: "Check YAML syntax"
+      
+      - id: check-toml
+        name: check toml
+        description: "Check TOML syntax"
+      
+      - id: check-json
+        name: check json
+        description: "Check JSON syntax"
+      
+      - id: check-added-large-files
+        name: check for large files
+        args: ['--maxkb=500']
+        description: "Prevent commits of large files (>500KB)"
+      
+      - id: check-merge-conflict
+        name: check for merge conflicts
+        description: "Check for merge conflict markers"
+      
+      - id: mixed-line-ending
+        name: fix mixed line endings
+        args: ['--fix=lf']
+        description: "Normalize line endings to LF"
+
+  # Security checks
+  - repo: https://github.com/Yelp/detect-secrets
+    rev: v1.5.0
+    hooks:
+      - id: detect-secrets
+        name: detect secrets
+        args: ['--baseline', '.secrets.baseline']
+        description: "Detect hardcoded secrets in code"
+
+# CI mode (skip slow hooks)
+# Run with: SKIP=cargo-test-unit,pytest-unit pre-commit run --all-files
