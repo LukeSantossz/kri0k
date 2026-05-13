@@ -19,8 +19,11 @@ License v3" ou "Anti-996"), comunicada claramente como:
   violação não invalida copyright mas constitui descumprimento contratual.
 
 ## Status atual
-Decisão **pendente**. Repo nasceu com MIT (T5) como placeholder. Card de
-decisão de licença deve ser aberto antes do MVP-1 release.
+**MIT temporário para MVP-0** (decisão de 2026-05-13, T10.1). Repo nasceu com
+MIT (T5) como placeholder e permanecerá MIT até card KRK-LICENSE finalizar a
+decisão Apache 2.0 + cláusula ética antes do MVP-1 release. Todas as fontes
+(LICENSE, Cargo.toml, pyproject.toml, README.md) foram sincronizadas para MIT
+com comentários apontando para este ADR e o card KRK-LICENSE.
 
 ## Consequências (se aprovada)
 - ✅ Comunidade entende que forks removendo guards estão fora do espírito.

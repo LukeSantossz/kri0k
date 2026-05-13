@@ -9,7 +9,7 @@ members = [
 [workspace.package]
 rust-version = "1.75.0"
 edition = "2021"
-license = "TBD"
+license = "MIT"  # TODO(KRK-LICENSE): Finalize with ethical clause per ADR-0010
 
 [workspace.dependencies]
 serde = { version = "1.0", features = ["derive"] }

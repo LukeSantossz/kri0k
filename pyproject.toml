@@ -13,7 +13,7 @@ authors = [
     {name = "Lucas Santos", email = "LukeSantossz@users.noreply.github.com"},
 ]
 readme = "README.md"
-license = {text = "TBD"}  # See ADR-0010
+license = {text = "MIT"}  # TODO(KRK-LICENSE): Finalize with ethical clause per ADR-0010
 requires-python = ">=3.11"
 classifiers = [
     "Development Status :: 3 - Alpha",
