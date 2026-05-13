@@ -43,20 +43,31 @@ A ambição é explorar orquestração de ataques com um **grafo de estado persi
 
 ## Qual é o estágio?
 
-**Status: MVP-0 em desenvolvimento**
+**Status: MVP-0 concluído ✅ ([v0.0.1-mvp0](https://github.com/LukeSantossz/kri0k/releases/tag/v0.0.1-mvp0))**
 
 | Estágio | Status | Descrição |
 |---------|--------|-----------|
-| **MVP-0** | ✅ Em andamento | Scaffold Rust+Python, estrutura do repositório, interop PyO3 base |
-| **MVP-1** | ⏳ Pendente | Agente LangGraph operando sobre o grafo serializado, mapeamento ATT&CK |
-| **Visão completa** | ⏳ Pendente | Persistência de estado entre sessões, módulos recon hickory-dns, expansão de TTPs |
+| **MVP-0** | ✅ Concluído | Scaffold Rust+Python, estrutura do repositório, interop PyO3 base, safeguards stubs |
+| **MVP-1** | ⏳ Próximo | Agente LangGraph operando sobre o grafo serializado, mapeamento ATT&CK |
+| **Visão completa** | ⏳ Planejado | Persistência de estado entre sessões, módulos recon hickory-dns, expansão de TTPs |
 
-**O que está pronto:**
+**O que está pronto (v0.0.1-mvp0):**
 
 - Repositório público configurado (MIT License, .gitignore Rust+Python)
 - Scaffold do núcleo Rust (Tokio runtime, petgraph para grafo de estado)
 - Estrutura PyO3 para interoperabilidade Rust/Python
 - README com DISCLAIMER de uso responsável e badges
+- **Framework de safeguards de segurança** (stubs com TODOs para T7):
+  - Validação de escopo
+  - Verificações de permissão
+  - Rate limiting
+  - Activity logging
+- **Quality gates aprovados**:
+  - ✅ cargo build (clean)
+  - ✅ cargo test (10/10 pass)
+  - ✅ cargo clippy --deny warnings (clean)
+  - ✅ cargo fmt --check (clean)
+- SECURITY.md com política de disclosure
 
 **O que está pendente:**
 
