@@ -16,16 +16,20 @@ Threat-model notes:
 
 from __future__ import annotations
 
+import asyncio
 from dataclasses import dataclass
 import logging
 import random
-from types import TracebackType
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import httpx
 
-from kri0k.llm.config import LLMConfig
 from kri0k.llm.rate_limit import TokenBucket
+
+if TYPE_CHECKING:
+    from types import TracebackType
+
+    from kri0k.llm.config import LLMConfig
 
 # --- Constants --------------------------------------------------------------
 
@@ -65,11 +69,11 @@ class _BackoffPlan:
 
     def delay_for(self, attempt: int) -> float:
         """Return jittered delay for the given (0-indexed) attempt."""
-        raw = min(self.max_s, self.base_s * (2**attempt))
+        raw: float = min(self.max_s, self.base_s * (2**attempt))
         if self.jitter <= 0:
             return raw
-        offset = _RNG.uniform(-self.jitter, self.jitter)
-        return max(0.0, raw * (1.0 + offset))
+        offset: float = float(_RNG.uniform(-self.jitter, self.jitter))
+        return float(max(0.0, raw * (1.0 + offset)))
 
 
 # --- Provider ---------------------------------------------------------------
@@ -104,7 +108,7 @@ class OllamaProvider:
 
     # -- lifecycle ------------------------------------------------------
 
-    async def __aenter__(self) -> "OllamaProvider":
+    async def __aenter__(self) -> OllamaProvider:
         return self
 
     async def __aexit__(
@@ -142,9 +146,7 @@ class OllamaProvider:
         try:
             content = data["message"]["content"]
         except (KeyError, TypeError) as exc:
-            raise LLMResponseError(
-                "Ollama response missing 'message.content'"
-            ) from exc
+            raise LLMResponseError("Ollama response missing 'message.content'") from exc
         if not isinstance(content, str):
             raise LLMResponseError(
                 f"Ollama 'message.content' must be str, got {type(content).__name__}"
@@ -200,9 +202,7 @@ class OllamaProvider:
                 # Malformed JSON is not a transport hiccup — surface it.
                 raise LLMResponseError("Ollama returned non-JSON body") from exc
             if not isinstance(data, dict):
-                raise LLMResponseError(
-                    f"Ollama JSON must be an object, got {type(data).__name__}"
-                )
+                raise LLMResponseError(f"Ollama JSON must be an object, got {type(data).__name__}")
             return data
 
         raise LLMRetryExhaustedError(
@@ -210,8 +210,5 @@ class OllamaProvider:
         ) from last_exc
 
     async def _sleep_backoff(self, attempt: int) -> None:
-        # Imported lazily so tests can monkeypatch a single symbol.
-        import asyncio
-
         delay = self._backoff.delay_for(attempt)
         await asyncio.sleep(delay)

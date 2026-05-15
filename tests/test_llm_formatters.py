@@ -80,9 +80,7 @@ def test_truncation_handles_multibyte_boundary() -> None:
 
 def test_fence_tokens_are_neutralized() -> None:
     for token in PROMPT_FENCE_TOKENS:
-        snapshot = {
-            "nodes": [{"id": "n1", "kind": "host", "banner": f"prefix{token}suffix"}]
-        }
+        snapshot = {"nodes": [{"id": "n1", "kind": "host", "banner": f"prefix{token}suffix"}]}
         out = format_snapshot_hybrid(snapshot)
         payload = _extract_json_block(out)
         assert token not in payload["nodes"][0]["banner"], f"Token leaked: {token!r}"

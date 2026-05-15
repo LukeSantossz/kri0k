@@ -5,6 +5,7 @@ import inspect
 
 import pytest
 
+import kri0k.llm as kllm
 from kri0k.llm import LLMConfig, OllamaProvider, build_provider
 
 
@@ -33,8 +34,6 @@ def test_chat_is_coroutine_function() -> None:
 
 
 def test_public_exports() -> None:
-    import kri0k.llm as pkg
-
     expected = {
         "LLMConfig",
         "LLMError",
@@ -47,6 +46,6 @@ def test_public_exports() -> None:
         "format_snapshot_hybrid",
         "ping_ollama",
     }
-    assert set(pkg.__all__) == expected
+    assert set(kllm.__all__) == expected
     for name in expected:
-        assert hasattr(pkg, name), f"Missing export: {name}"
+        assert hasattr(kllm, name), f"Missing export: {name}"

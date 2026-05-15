@@ -46,12 +46,12 @@ def test_from_scope_dict_rejects_unknown_key() -> None:
 
 
 def test_from_scope_dict_rejects_non_mapping_block() -> None:
-    with pytest.raises(ValueError, match="scope.yaml::llm must be a mapping"):
+    with pytest.raises(TypeError, match="must be a mapping"):
         LLMConfig.from_scope_dict({"llm": ["not", "a", "mapping"]})
 
 
 def test_from_scope_dict_rejects_non_string_model() -> None:
-    with pytest.raises(ValueError, match="must be a string"):
+    with pytest.raises(TypeError, match="must be a string"):
         LLMConfig.from_scope_dict({"llm": {"model": 42}})
 
 

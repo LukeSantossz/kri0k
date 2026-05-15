@@ -68,7 +68,8 @@ async def test_sense_node_returns_snapshot_dict() -> None:
     assert "snapshot" in result
     snap = result["snapshot"]
     assert isinstance(snap, dict)
-    assert "raw" in snap and "formatted" in snap
+    assert "raw" in snap
+    assert "formatted" in snap
 
 
 @pytest.mark.asyncio

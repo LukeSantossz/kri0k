@@ -25,9 +25,7 @@ MAX_FIELD_BYTES = 1024
 #: Field names whose values are most likely to carry attacker-controlled
 #: text. They are still emitted, but always go through the full sanitization
 #: pipeline regardless of nesting depth.
-SENSITIVE_FIELD_NAMES: frozenset[str] = frozenset(
-    {"banner", "headers", "body", "raw_response"}
-)
+SENSITIVE_FIELD_NAMES: frozenset[str] = frozenset({"banner", "headers", "body", "raw_response"})
 
 #: Tokens that could close the JSON fence or inject role markers used by
 #: chat templates (Qwen, ChatML, Llama). Any occurrence in a leaf string is
@@ -43,11 +41,14 @@ PROMPT_FENCE_TOKENS: tuple[str, ...] = (
 
 _ELLIPSIS = "…[truncated]"
 _ZWSP = "\u200b"  # Zero-width space used to break fence tokens.
+_FIRST_PRINTABLE_CODEPOINT = 0x20  # ASCII space; everything below is C0 control.
 
 
 def _strip_control_chars(value: str) -> str:
     """Remove ASCII control chars except \\n and \\t."""
-    return "".join(ch for ch in value if ch in ("\n", "\t") or ord(ch) >= 0x20)
+    return "".join(
+        ch for ch in value if ch in ("\n", "\t") or ord(ch) >= _FIRST_PRINTABLE_CODEPOINT
+    )
 
 
 def _strip_fence_tokens(value: str) -> str:

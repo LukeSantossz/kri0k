@@ -28,7 +28,8 @@ def clock(monkeypatch):
 
 
 @pytest.mark.asyncio
-async def test_initial_capacity_allows_burst(clock) -> None:
+@pytest.mark.usefixtures("clock")
+async def test_initial_capacity_allows_burst() -> None:
     bucket = TokenBucket(capacity=10, refill_per_window=10, window_s=60.0)
     for _ in range(10):
         await bucket.acquire()

@@ -63,13 +63,19 @@ async def ping_ollama(
     """
     prompt = render("healthcheck.jinja2")
 
-    owns_provider = provider is None
+    # Track the auto-created provider separately so we own its lifecycle
+    # without leaking that responsibility into the LLMProvider Protocol
+    # (which does not require `aclose`).
+    owned: OllamaProvider | None = None
     if provider is None:
-        provider = OllamaProvider(config)
+        owned = OllamaProvider(config)
+        target: LLMProvider = owned
+    else:
+        target = provider
 
     started = time.monotonic()
     try:
-        text = await provider.chat(prompt=prompt)
+        text = await target.chat(prompt=prompt)
     except (LLMError, httpx.HTTPError) as exc:
         latency_ms = (time.monotonic() - started) * 1000.0
         return PingResult(
@@ -80,9 +86,8 @@ async def ping_ollama(
             error=f"{type(exc).__name__}: {exc}",
         )
     finally:
-        if owns_provider:
-            # `provider` was just created; close its owned client.
-            await provider.aclose()  # type: ignore[union-attr]
+        if owned is not None:
+            await owned.aclose()
 
     latency_ms = (time.monotonic() - started) * 1000.0
     excerpt = text[:_EXCERPT_LIMIT]

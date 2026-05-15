@@ -53,7 +53,7 @@ class LLMConfig:
         """
         llm_block = scope.get("llm") or {}
         if not isinstance(llm_block, Mapping):
-            raise ValueError(f"scope.yaml::llm must be a mapping, got {type(llm_block).__name__}")
+            raise TypeError(f"scope.yaml::llm must be a mapping, got {type(llm_block).__name__}")
 
         unknown = set(llm_block.keys()) - _ALLOWED_SCOPE_KEYS
         if unknown:
@@ -65,5 +65,5 @@ class LLMConfig:
         if model is None:
             return cls()
         if not isinstance(model, str):
-            raise ValueError(f"scope.yaml::llm.model must be a string, got {type(model).__name__}")
+            raise TypeError(f"scope.yaml::llm.model must be a string, got {type(model).__name__}")
         return cls(model=model)

@@ -53,9 +53,7 @@ def _no_real_sleep(monkeypatch):
 @pytest.fixture(autouse=True)
 def _deterministic_jitter(monkeypatch):
     """Force jitter to 0 for predictable assertions."""
-    monkeypatch.setattr(
-        "kri0k.llm.ollama._RNG.uniform", lambda _a, _b: 0.0
-    )
+    monkeypatch.setattr("kri0k.llm.ollama._RNG.uniform", lambda _a, _b: 0.0)
 
 
 @pytest.mark.asyncio
