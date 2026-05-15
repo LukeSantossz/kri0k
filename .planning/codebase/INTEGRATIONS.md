@@ -1,6 +1,6 @@
 # External Integrations
 
-**Analysis Date:** 2025-05-14
+**Analysis Date:** 2026-05-15
 
 ## APIs & External Services
 
@@ -40,20 +40,29 @@
 
 **Graph State:**
 - In-memory: `petgraph::StableGraph` wrapped in `kri0k-graph::Graph`
+- Node types: `Host` (ip), `Network` (cidr), `Service` (port, protocol), `Finding` (description)
+- Edge types: `BelongsTo`, `RunsOn`, `RelatesTo` (relation)
 - Persistence: JSONL snapshots on engagement close
 - Location: `engagement/<id>/` directory structure (planned)
+
+**Agent State (Phase 1):**
+- In-memory: `AgentState` TypedDict passed between LangGraph nodes
+- Fields: `snapshot`, `analysis`, `proposal`, `decision`, `iteration_count`, `history`, `engagement_context`
+- Persistence: Not yet implemented (planned for future phases)
 
 **Audit Log:**
 - Format: Append-only hash-chained JSONL (ADR-0007)
 - Location: `engagement/<id>/audit.jsonl`
 - Fields: `ts`, `audit_id` (ULID), `kind`, `payload`, `prev_hash`, `hash`
 - Not encrypted by default
+- Implementation: Stub in `crates/kri0k-core/src/audit.rs`
 
 **Scope Configuration:**
 - Format: YAML
 - Location: `config/scope.yaml` (user-provided)
 - Example: `config/scope.example.yaml`
 - SHA256 checksum embedded in all snapshots (ADR-0011)
+- Implementation: Stub in `crates/kri0k-core/src/scope.rs`
 
 **File Storage:**
 - Local filesystem only
@@ -73,11 +82,12 @@
 - `scope.yaml` defines authorized targets (CIDR notation)
 - Target validation enforced in Rust before any TTP execution
 - Scope hash propagates through all snapshots
+- Implementation: `validate_target()` in `crates/kri0k-core/src/scope.rs` (stub)
 
 ## Monitoring & Observability
 
 **Tracing:**
-- `tracing` crate (Rust) - Structured logging infrastructure
+- `tracing` crate (Rust) - Structured logging infrastructure (planned)
 - OTLP export: Planned (subscriber pluggable)
 - Audit log separate from tracing (forensics vs debug)
 
@@ -86,7 +96,7 @@
 - Errors captured in audit log
 
 **Logs:**
-- Rust: `tracing` crate
+- Rust: `tracing` crate (planned)
 - Python: Standard logging (via LangGraph)
 - Audit: Separate append-only JSONL
 
@@ -98,9 +108,12 @@
 
 **CI Pipeline:**
 - Pre-commit hooks via `pre-commit` (>=3.8)
+  - cargo-fmt, cargo-clippy, cargo-test-unit
+  - ruff lint, ruff format, mypy
+  - pytest-unit
+  - detect-secrets
 - Cargo clippy with `-D warnings` (deny all warnings)
 - Ruff + mypy for Python
-- Cargo test + pytest for testing
 
 **Build:**
 - maturin builds PyO3 extension
@@ -121,6 +134,7 @@
 **Secrets location:**
 - API keys in environment variables (not committed)
 - No secrets checked into repository
+- `.env` files in `.gitignore`
 
 ## Webhooks & Callbacks
 
@@ -136,6 +150,11 @@
 - Module: `kri0k._native` (cdylib)
 - Build: maturin with `pyo3/extension-module` feature
 - GIL handling: Released during graph operations (`py.allow_threads()`)
+- Type stubs: `python/kri0k/_native.pyi`
+
+**Exposed Functions:**
+- `hello() -> str` - Initialization confirmation
+- `get_dummy_graph() -> dict[str, Any]` - Test graph structure with nodes/edges
 
 **Data Exchange:**
 - JSON serialization for snapshots
@@ -145,6 +164,26 @@
 **Runtime:**
 - Global Tokio runtime initialized on module load
 - 2 worker threads named `kri0k-tokio`
+- `OnceLock<tokio::runtime::Runtime>` for lazy initialization
+
+## LangGraph Integration (Phase 1)
+
+**Graph Structure:**
+- Location: `python/kri0k/agent/graph.py`
+- Entry: `get_graph()` returns compiled `StateGraph[AgentState]`
+- Nodes: sense, reason, plan, act, reflect (linear sequence)
+- Edges: START -> sense -> reason -> plan -> act -> reflect -> (conditional)
+- Conditional routing: `route_after_reflect()` checks `iteration_count >= MAX_ITERATIONS`
+
+**State Flow:**
+- State TypedDict flows through all nodes
+- Each node returns partial state updates (merged by LangGraph)
+- `reflect` node increments `iteration_count`
+- Loop terminates when `iteration_count >= 10`
+
+**Async Execution:**
+- All node functions are `async def`
+- Compatible with pytest-asyncio for testing
 
 ## Planned Integrations (MVP-1+)
 
@@ -166,4 +205,4 @@
 
 ---
 
-*Integration audit: 2025-05-14*
+*Integration audit: 2026-05-15*

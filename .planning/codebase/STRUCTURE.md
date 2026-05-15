@@ -1,6 +1,6 @@
 # Codebase Structure
 
-**Analysis Date:** 2026-05-14
+**Analysis Date:** 2026-05-15
 
 ## Directory Layout
 
@@ -25,7 +25,22 @@ kri0k/
 │       └── THREAT_MODEL.md     # Threat model document
 ├── python/                     # Python source
 │   └── kri0k/                  # Main Python package
+│       ├── __init__.py         # Package entry, re-exports _native
+│       ├── _native.pyi         # Type stubs for Rust bindings
+│       └── agent/              # LangGraph agent module
+│           ├── __init__.py     # Exports AgentState, get_graph
+│           ├── state.py        # AgentState TypedDict definition
+│           ├── graph.py        # StateGraph builder, routing
+│           └── nodes/          # 5 engagement loop nodes
+│               ├── __init__.py # Re-exports all node functions
+│               ├── sense.py    # Observe graph state
+│               ├── reason.py   # Analyze observations
+│               ├── plan.py     # Generate proposals
+│               ├── act.py      # Execute actions
+│               └── reflect.py  # Evaluate and loop control
 ├── tests/                      # Python tests
+│   ├── test_smoke.py           # Native bindings smoke tests
+│   └── test_agent_graph.py     # LangGraph agent tests
 ├── Cargo.toml                  # Workspace manifest
 ├── Cargo.lock                  # Dependency lockfile
 ├── pyproject.toml              # Python/maturin config
@@ -79,18 +94,30 @@ kri0k/
 
 **`python/kri0k/`:**
 - Purpose: Python package source
-- Contains: Package init, type stubs for native module
-- Key files: `__init__.py`, `_native.pyi`
+- Contains: Package init, type stubs, agent module
+- Key files: `__init__.py`, `_native.pyi`, `agent/`
+
+**`python/kri0k/agent/`:**
+- Purpose: LangGraph-based autonomous agent
+- Contains: State schema, graph builder, node functions
+- Key files: `state.py`, `graph.py`, `nodes/`
+
+**`python/kri0k/agent/nodes/`:**
+- Purpose: Individual engagement loop node implementations
+- Contains: 5 async node functions (sense, reason, plan, act, reflect)
+- Key files: `sense.py`, `reason.py`, `plan.py`, `act.py`, `reflect.py`
 
 **`tests/`:**
 - Purpose: Python test suite
-- Contains: Smoke tests, integration tests
-- Key files: `test_smoke.py`
+- Contains: Smoke tests, agent graph tests
+- Key files: `test_smoke.py`, `test_agent_graph.py`
 
 ## Key File Locations
 
 **Entry Points:**
 - `python/kri0k/__init__.py`: Python package entry point
+- `python/kri0k/agent/__init__.py`: Agent module entry, exports `AgentState`, `get_graph`
+- `python/kri0k/agent/graph.py:36`: `get_graph()` function builds compiled StateGraph
 - `crates/kri0k-pybridge/src/lib.rs`: Native module init (`#[pymodule] fn _native`)
 - `pyproject.toml:60`: CLI entry point definition (`kri0k = "kri0k.cli:main"`)
 
@@ -109,8 +136,18 @@ kri0k/
 - `crates/kri0k-core/src/ttp.rs`: Ttp trait, ExecutionPlan, RateLimits
 - `crates/kri0k-graph/src/lib.rs`: Graph, Node, Edge, NodeKind, EdgeKind
 
+**LangGraph Agent:**
+- `python/kri0k/agent/state.py`: `AgentState` TypedDict (7 fields)
+- `python/kri0k/agent/graph.py`: `get_graph()`, `route_after_reflect()`, `MAX_ITERATIONS`
+- `python/kri0k/agent/nodes/sense.py`: Observe graph state from Rust
+- `python/kri0k/agent/nodes/reason.py`: Analyze observations
+- `python/kri0k/agent/nodes/plan.py`: Generate action proposals
+- `python/kri0k/agent/nodes/act.py`: Execute approved actions
+- `python/kri0k/agent/nodes/reflect.py`: Evaluate results, increment iteration
+
 **Testing:**
 - `tests/test_smoke.py`: Python smoke tests for native bindings
+- `tests/test_agent_graph.py`: LangGraph agent structure and node tests (14 tests)
 
 **Documentation:**
 - `docs/ARCHITECTURE.md`: System architecture (Portuguese, detailed)
@@ -121,25 +158,29 @@ kri0k/
 
 **Files:**
 - Rust: `snake_case.rs` (e.g., `lib.rs`, `audit.rs`)
-- Python: `snake_case.py` (e.g., `__init__.py`, `test_smoke.py`)
+- Python: `snake_case.py` (e.g., `__init__.py`, `state.py`, `sense.py`)
 - Docs: `UPPERCASE.md` for key docs (e.g., `ARCHITECTURE.md`, `THREAT_MODEL.md`)
 - ADRs: `ADR-NNNN-kebab-case-title.md` (e.g., `ADR-0001-canonical-state-in-rust.md`)
+- Tests: `test_{feature}.py` (e.g., `test_smoke.py`, `test_agent_graph.py`)
 
 **Directories:**
 - Rust crates: `kri0k-{name}` prefix (e.g., `kri0k-core`, `kri0k-graph`)
-- Python: `snake_case` (e.g., `kri0k/`)
+- Python packages: `snake_case` (e.g., `kri0k/`, `agent/`, `nodes/`)
 - Config: `lowercase` (e.g., `config/`)
 
 **Types/Structs:**
 - Rust: `PascalCase` (e.g., `NodeId`, `AuditSink`, `SafeguardsConfig`)
-- Python: `PascalCase` for classes, `snake_case` for functions
+- Python TypedDict: `PascalCase` (e.g., `AgentState`)
+- Python classes: `PascalCase`
 
 **Functions:**
 - Rust: `snake_case` (e.g., `validate_target`, `add_node`)
-- Python: `snake_case` (e.g., `get_dummy_graph`, `test_hello`)
+- Python: `snake_case` (e.g., `get_graph`, `route_after_reflect`)
+- Node functions: `snake_case` verb (e.g., `sense`, `reason`, `plan`, `act`, `reflect`)
 
 **Constants:**
 - Rust: `SCREAMING_SNAKE_CASE` (e.g., `TOKIO_RUNTIME`)
+- Python: `SCREAMING_SNAKE_CASE` (e.g., `MAX_ITERATIONS`)
 
 ## Where to Add New Code
 
@@ -157,17 +198,31 @@ kri0k/
 - Export: Add to `python/kri0k/__init__.py`
 - Type stubs: `python/kri0k/{module}.pyi` if needed
 
-**New LangGraph Node (planned):**
-- Location: `python/kri0k/nodes/{node_name}.py`
-- Pattern: Follow sense/reason/plan/act/reflect structure
+**New LangGraph Node:**
+- Location: `python/kri0k/agent/nodes/{node_name}.py`
+- Pattern: `async def {node_name}(state: AgentState) -> dict[str, Any]`
+- Export: Add to `python/kri0k/agent/nodes/__init__.py`
+- Register: Add `graph.add_node("{name}", {name})` in `graph.py`
+- Connect: Add edges in `graph.py`
+
+**Modify Agent State:**
+- Edit: `python/kri0k/agent/state.py` AgentState TypedDict
+- Update: All node return types that set new fields
+- Test: Add field assertion in `tests/test_agent_graph.py:test_agent_state_has_required_fields`
+
+**New Conditional Route:**
+- Location: `python/kri0k/agent/graph.py`
+- Pattern: `def route_{from_node}(state: AgentState) -> str`
+- Register: `graph.add_conditional_edges("{from_node}", route_{from_node})`
 
 **New LLM Provider (planned):**
 - Location: `python/kri0k/providers/{provider}.py`
-- Pattern: Implement `LLMProvider` trait
+- Pattern: Implement `LLMProvider` protocol/ABC
 
 **New Test:**
 - Rust unit test: Add `#[cfg(test)] mod tests` in same file
 - Python test: `tests/test_{feature}.py`
+- Agent test: Add to `tests/test_agent_graph.py` for graph/node tests
 
 **New ADR:**
 - Location: `docs/adr/ADR-NNNN-title.md`
@@ -217,6 +272,12 @@ kri0k-core (foundation)
     │                └── kri0k._native (Python extension module)
     │                         │
     │                         └── kri0k (Python package)
+    │                                  │
+    │                                  └── kri0k.agent (LangGraph agent)
+    │                                           │
+    │                                           ├── state.py (AgentState)
+    │                                           ├── graph.py (StateGraph)
+    │                                           └── nodes/ (5 node functions)
     │
     └── kri0k-ttp (planned, will depend on kri0k-core)
     └── kri0k-scope (planned, will depend on kri0k-core)
@@ -251,6 +312,21 @@ python-source = "python"
 
 The native Rust code compiles to `kri0k._native` module, re-exported by `python/kri0k/__init__.py`.
 
+**Agent Module Structure:**
+```
+python/kri0k/agent/
+├── __init__.py     # Exports: AgentState, get_graph
+├── state.py        # AgentState TypedDict (7 fields)
+├── graph.py        # get_graph(), route_after_reflect(), MAX_ITERATIONS=10
+└── nodes/
+    ├── __init__.py # Exports: sense, reason, plan, act, reflect
+    ├── sense.py    # async def sense(state) -> dict
+    ├── reason.py   # async def reason(state) -> dict
+    ├── plan.py     # async def plan(state) -> dict
+    ├── act.py      # async def act(state) -> dict
+    └── reflect.py  # async def reflect(state) -> dict (increments iteration_count)
+```
+
 ---
 
-*Structure analysis: 2026-05-14*
+*Structure analysis: 2026-05-15*

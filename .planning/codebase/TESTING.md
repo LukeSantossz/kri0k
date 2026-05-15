@@ -1,6 +1,6 @@
 # Testing Patterns
 
-**Analysis Date:** 2026-05-14
+**Analysis Date:** 2026-05-15
 
 ## Test Framework
 
@@ -26,12 +26,15 @@ cargo test -p kri0k-core               # Single crate
 
 **Assertion Library:** Built-in `assert` (pytest native)
 
+**Async Support:** pytest-asyncio 0.24+
+
 **Run Commands:**
 ```bash
 pytest                                 # All tests
 pytest -m unit                         # Unit tests only
 pytest -m integration                  # Integration tests
 pytest -m graph                        # Graph fixture tests
+pytest tests/test_agent_graph.py       # Single test file
 pytest --cov=kri0k --cov-report=html   # With coverage
 ```
 
@@ -57,18 +60,19 @@ crates/kri0k-graph/src/
 
 ### Python Test Location
 
-**Pattern:** Separate `tests/` directory
+**Pattern:** Separate `tests/` directory at project root
 
 **Structure:**
 ```
 tests/
-├── test_smoke.py   # Smoke tests (cross-language)
-├── unit/           # Unit tests (planned)
-├── integration/    # Integration tests (planned)
-├── graph/          # Graph fixture tests (planned)
-├── ttp/            # TTP tests (planned)
-├── audit/          # Audit log tests (planned)
-└── fixtures/       # Test fixtures (planned)
+├── test_smoke.py         # Smoke tests (Rust-Python bridge)
+├── test_agent_graph.py   # LangGraph agent tests (12 tests)
+├── unit/                 # Unit tests (planned)
+├── integration/          # Integration tests (planned)
+├── graph/                # Graph fixture tests (planned)
+├── ttp/                  # TTP tests (planned)
+├── audit/                # Audit log tests (planned)
+└── fixtures/             # Test fixtures (planned)
 ```
 
 **Naming:** `test_*.py` or `*_test.py` files
@@ -114,43 +118,83 @@ mod tests {
 - `#[test]` attribute on each test function
 - Descriptive function names: `test_<noun>_<action>` or `test_<action>_<noun>`
 
-### Python Test Pattern
+### Python Sync Test Pattern
 
 ```python
-"""Smoke tests for kri0k Python package."""
+"""Tests for the LangGraph agent structure and execution."""
 
-import kri0k
+from langgraph.graph import END
+import pytest
 
-
-def test_hello() -> None:
-    """Test hello() function from Rust core."""
-    result = kri0k.hello()
-    assert isinstance(result, str)
-    assert "kri0k" in result.lower()
-    assert len(result) > 0
+from kri0k.agent import AgentState, get_graph
+from kri0k.agent.graph import MAX_ITERATIONS, route_after_reflect
 
 
-def test_get_dummy_graph_structure() -> None:
-    """Test get_dummy_graph() returns valid structure."""
-    graph = kri0k.get_dummy_graph()
+def test_get_graph_compiles() -> None:
+    """Test that get_graph() returns a compiled graph."""
+    graph = get_graph()
+    assert graph is not None
+    assert hasattr(graph, "invoke")
 
-    # Verify top-level structure
-    assert isinstance(graph, dict)
-    assert "nodes" in graph
-    assert "edges" in graph
 
-    # Verify nodes structure
-    nodes = graph["nodes"]
-    assert isinstance(nodes, list)
-    assert len(nodes) > 0
+def test_graph_has_five_nodes() -> None:
+    """Test that the graph contains all five engagement loop nodes."""
+    graph = get_graph()
+    node_names = set(graph.nodes.keys())
+    expected_nodes = {"sense", "reason", "plan", "act", "reflect"}
+    assert expected_nodes.issubset(node_names), f"Missing nodes: {expected_nodes - node_names}"
 ```
 
 **Key Patterns:**
 - Module docstring describing test file purpose
 - Function docstring describing individual test
 - Type annotation `-> None` on test functions
-- Multiple assertions per test (related checks grouped)
-- Descriptive variable names (`nodes`, `edges`, `graph`)
+- Descriptive assertion messages using f-strings
+- Import constants directly: `from kri0k.agent.graph import MAX_ITERATIONS`
+
+### Python Async Test Pattern
+
+```python
+import pytest
+
+from kri0k.agent.nodes import act, plan, reason, reflect, sense
+
+
+def _minimal_state() -> AgentState:
+    """Create a minimal AgentState with default values."""
+    return AgentState(
+        snapshot={},
+        analysis={},
+        proposal={},
+        decision={},
+        iteration_count=0,
+        history=[],
+        engagement_context={},
+    )
+
+
+@pytest.mark.asyncio
+async def test_sense_node_returns_empty_dict() -> None:
+    """Test that sense node placeholder returns empty dict."""
+    state = _minimal_state()
+    result = await sense(state)
+    assert result == {}
+
+
+@pytest.mark.asyncio
+async def test_reflect_node_increments_iteration() -> None:
+    """Test that reflect node increments iteration_count."""
+    state = _minimal_state()
+    state["iteration_count"] = 5
+    result = await reflect(state)
+    assert result == {"iteration_count": 6}
+```
+
+**Key Patterns:**
+- Use `@pytest.mark.asyncio` decorator for async tests
+- Use `await` when calling async node functions
+- Create helper factory functions with leading underscore (`_minimal_state()`)
+- Test state mutations through TypedDict key access
 
 ## Test Markers (Python)
 
@@ -159,7 +203,7 @@ def test_get_dummy_graph_structure() -> None:
 ```toml
 markers = [
     "unit: Unit tests (fast, no I/O)",
-    "integration: Integration tests (cross-language, Rust ↔ Python)",
+    "integration: Integration tests (cross-language, Rust <-> Python)",
     "slow: Slow tests (network, external tools)",
     "ttp: TTP-specific tests (requires external tools: nmap, dig, whois)",
     "graph: Graph fixture tests (petgraph state validation)",
@@ -177,6 +221,10 @@ def test_something_fast():
 
 @pytest.mark.integration
 def test_rust_python_bridge():
+    ...
+
+@pytest.mark.asyncio
+async def test_async_node():
     ...
 
 @pytest.mark.ttp
@@ -210,26 +258,49 @@ pytest -m "not slow"     # Exclude slow tests
 ### 2. Python Smoke Tests
 
 **Location:** `tests/test_smoke.py`
-**Purpose:** Verify Rust ↔ Python bridge works
+**Purpose:** Verify Rust - Python bridge works
 **Run:** `pytest tests/test_smoke.py`
 
-**Current tests:**
+**Current tests (3 tests):**
 - `test_hello()`: Verify `kri0k.hello()` returns string with "kri0k"
 - `test_get_dummy_graph_structure()`: Verify graph dict structure
 - `test_graph_node_kinds()`: Verify node type serialization
 
-### 3. Integration Tests (Planned)
+### 3. LangGraph Agent Tests
+
+**Location:** `tests/test_agent_graph.py`
+**Purpose:** Test LangGraph agent structure and node behavior
+**Run:** `pytest tests/test_agent_graph.py`
+
+**Current tests (12 tests):**
+
+| Test | Purpose |
+|------|---------|
+| `test_get_graph_compiles` | Graph compiles and has invoke method |
+| `test_graph_has_five_nodes` | All 5 engagement nodes present |
+| `test_agent_state_has_required_fields` | TypedDict has 7 required fields |
+| `test_sense_node_returns_empty_dict` | Sense placeholder returns {} |
+| `test_reason_node_returns_empty_dict` | Reason placeholder returns {} |
+| `test_plan_node_returns_empty_dict` | Plan placeholder returns {} |
+| `test_act_node_returns_empty_dict` | Act placeholder returns {} |
+| `test_reflect_node_increments_iteration` | Reflect increments iteration_count |
+| `test_route_after_reflect_continues_under_max` | Router returns "sense" when < 10 |
+| `test_route_after_reflect_ends_at_max` | Router returns END at 10 |
+| `test_route_after_reflect_ends_above_max` | Router returns END above 10 |
+| `test_max_iterations_is_ten` | MAX_ITERATIONS constant is 10 |
+
+### 4. Integration Tests (Planned)
 
 **Location:** `tests/integration/`
-**Purpose:** Test Rust ↔ Python interactions via PyO3 bridge
+**Purpose:** Test Rust - Python interactions via PyO3 bridge
 **Marker:** `@pytest.mark.integration`
 **Run:** `pytest -m integration`
 
 **Expected tests (from CONTRIBUTING.md):**
 - `test_pybridge.py`: Snapshot codec, Proposal validation
-- `test_engagement_lifecycle.py`: open → snapshot → validate → execute → close
+- `test_engagement_lifecycle.py`: open -> snapshot -> validate -> execute -> close
 
-### 4. Graph Fixture Tests (Planned)
+### 5. Graph Fixture Tests (Planned)
 
 **Location:** `tests/graph/`
 **Purpose:** Test graph state transitions, invariant preservation
@@ -239,9 +310,9 @@ pytest -m "not slow"     # Exclude slow tests
 **Expected tests:**
 - Node ID stability after add/remove
 - Edge integrity after node removal
-- Snapshot idempotency (serialize → deserialize → serialize)
+- Snapshot idempotency (serialize -> deserialize -> serialize)
 
-### 5. TTP Tests (Planned)
+### 6. TTP Tests (Planned)
 
 **Location:** `tests/ttp/`
 **Purpose:** Test TTP implementations with external tools
@@ -249,7 +320,7 @@ pytest -m "not slow"     # Exclude slow tests
 **Requirements:** External tools (nmap, dig, whois)
 **Run:** `pytest -m ttp` (slow, requires network)
 
-### 6. Audit Log Tests (Planned)
+### 7. Audit Log Tests (Planned)
 
 **Location:** `tests/audit/`
 **Purpose:** Validate audit log integrity, hash chaining
@@ -283,6 +354,28 @@ impl AuditSink for NoOpAuditSink {
 **Expected:** pytest fixtures + unittest.mock for integration tests
 
 ## Fixtures
+
+### Test Helper Functions
+
+**Pattern (from `tests/test_agent_graph.py`):**
+```python
+def _minimal_state() -> AgentState:
+    """Create a minimal AgentState with default values."""
+    return AgentState(
+        snapshot={},
+        analysis={},
+        proposal={},
+        decision={},
+        iteration_count=0,
+        history=[],
+        engagement_context={},
+    )
+```
+
+**Rules:**
+- Use leading underscore for non-test helper functions
+- Include docstring explaining purpose
+- Return fully-initialized objects with sensible defaults
 
 ### Planned Fixtures (from CONTRIBUTING.md)
 
@@ -403,15 +496,27 @@ integration:
 
 **Framework:** pytest-asyncio (in dev dependencies)
 
-**Pattern (expected):**
+**Pattern:**
 ```python
 import pytest
 
+from kri0k.agent.nodes import sense
+from kri0k.agent.state import AgentState
+
+
 @pytest.mark.asyncio
-async def test_async_operation():
-    result = await some_async_function()
-    assert result.ok
+async def test_sense_node_returns_empty_dict() -> None:
+    """Test that sense node placeholder returns empty dict."""
+    state = _minimal_state()
+    result = await sense(state)
+    assert result == {}
 ```
+
+**Rules:**
+- Import `pytest` at module level
+- Use `@pytest.mark.asyncio` decorator
+- Use `async def` for test function
+- Use `await` for async function calls
 
 ### Error Testing (Rust)
 
@@ -452,6 +557,26 @@ fn test_add_edge() {
 }
 ```
 
+### TypedDict Field Testing (Python)
+
+```python
+def test_agent_state_has_required_fields() -> None:
+    """Test that AgentState TypedDict has all 7 required fields."""
+    expected_fields = {
+        "snapshot",
+        "analysis",
+        "proposal",
+        "decision",
+        "iteration_count",
+        "history",
+        "engagement_context",
+    }
+    actual_fields = set(AgentState.__annotations__.keys())
+    assert expected_fields == actual_fields, (
+        f"Field mismatch. Expected: {expected_fields}, Got: {actual_fields}"
+    )
+```
+
 ### Cross-Language Testing (Python)
 
 ```python
@@ -473,6 +598,25 @@ def test_get_dummy_graph_structure() -> None:
     node = nodes[0]
     assert "id" in node
     assert "kind" in node
+```
+
+### Routing Function Testing (Python)
+
+```python
+def test_route_after_reflect_continues_under_max() -> None:
+    """Test that router returns 'sense' when under MAX_ITERATIONS."""
+    state = _minimal_state()
+    state["iteration_count"] = 5
+    result = route_after_reflect(state)
+    assert result == "sense"
+
+
+def test_route_after_reflect_ends_at_max() -> None:
+    """Test that router returns END when at MAX_ITERATIONS."""
+    state = _minimal_state()
+    state["iteration_count"] = 10
+    result = route_after_reflect(state)
+    assert result == END
 ```
 
 ## Pre-commit Test Hooks
@@ -501,6 +645,15 @@ SKIP=cargo-test-unit,pytest-unit pre-commit run --all-files
 - [ ] Graph fixture tests added/updated (if graph state changes)
 - [ ] Manual testing performed
 
+## Current Test Summary
+
+| Category | Location | Test Count |
+|----------|----------|------------|
+| Rust unit tests | `crates/*/src/*.rs` | ~15 |
+| Python smoke tests | `tests/test_smoke.py` | 3 |
+| Python agent tests | `tests/test_agent_graph.py` | 12 |
+| **Total** | | **~30** |
+
 ---
 
-*Testing analysis: 2026-05-14*
+*Testing analysis: 2026-05-15*

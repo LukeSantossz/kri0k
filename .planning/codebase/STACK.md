@@ -1,6 +1,6 @@
 # Technology Stack
 
-**Analysis Date:** 2025-05-14
+**Analysis Date:** 2026-05-15
 
 ## Languages
 
@@ -26,7 +26,7 @@
 
 **Package Managers:**
 - Cargo (Rust) - Lockfile: `Cargo.lock` present
-- pip/uv (Python) - Lockfile: managed via `pyproject.toml`
+- uv (Python) - Lockfile: `uv.lock` present
 
 ## Frameworks
 
@@ -35,8 +35,8 @@
 - pyo3 0.22 (extension-module feature) - Rust-Python bindings
 - tokio 1.40 (rt, rt-multi-thread, macros) - Async runtime
 
-**AI/Agent:**
-- langgraph >=0.2.0 - Agent orchestration (sense/reason/plan/act/reflect)
+**AI/Agent (Phase 1 Implemented):**
+- langgraph >=0.2.0 - Agent orchestration (sense/reason/plan/act/reflect loop)
 - langchain >=0.3.0 - LLM abstractions
 
 **Serialization:**
@@ -94,7 +94,7 @@
 **Python Type Checking:**
 - mypy strict mode with all warnings enabled
 - Platform: linux
-- Type stubs for `kri0k._native` native module
+- Type stubs for `kri0k._native` native module (`python/kri0k/_native.pyi`)
 
 **Environment:**
 - Scope configuration: `config/scope.example.yaml`
@@ -112,16 +112,52 @@
 ```
 crates/
 ├── kri0k-core/      # Runtime, scope, audit, types (serde, thiserror, ulid)
+│   └── src/
+│       ├── lib.rs       # NodeId, EdgeId, Error types
+│       ├── audit.rs     # AuditSink trait, event types (stub)
+│       ├── safeguards.rs # SafeguardsConfig (propose-only, kill switch)
+│       ├── scope.rs     # Scope struct, validate_target (stub)
+│       └── ttp.rs       # Ttp trait, RateLimits, ExecutionPlan (stub)
 ├── kri0k-graph/     # petgraph wrapper with typed nodes/edges
+│   └── src/lib.rs   # Graph, Node, Edge, NodeKind, EdgeKind
 └── kri0k-pybridge/  # PyO3 cdylib -> kri0k._native module
+    └── src/lib.rs   # hello(), get_dummy_graph(), global Tokio runtime
 ```
 
 **Python Package:**
 ```
-python/
-└── kri0k/
-    └── __init__.py  # Exports from _native (hello, get_dummy_graph)
+python/kri0k/
+├── __init__.py          # Exports from _native (hello, get_dummy_graph)
+├── _native.pyi          # Type stubs for Rust bindings
+└── agent/               # LangGraph agent module (Phase 1)
+    ├── __init__.py      # Exports AgentState, get_graph
+    ├── state.py         # AgentState TypedDict (7 fields)
+    ├── graph.py         # StateGraph builder with 5 nodes, conditional routing
+    └── nodes/           # Engagement loop node functions
+        ├── __init__.py  # Exports all 5 nodes
+        ├── sense.py     # Observe state from Rust snapshot (placeholder)
+        ├── reason.py    # Analyze observations (placeholder)
+        ├── plan.py      # Generate action proposals (placeholder)
+        ├── act.py       # Execute approved actions (placeholder)
+        └── reflect.py   # Evaluate results, increment iteration_count
 ```
+
+## Agent Architecture (Phase 1)
+
+**State Schema:**
+- `AgentState` TypedDict with 7 fields: `snapshot`, `analysis`, `proposal`, `decision`, `iteration_count`, `history`, `engagement_context`
+- Location: `python/kri0k/agent/state.py`
+
+**Graph Structure:**
+- 5 nodes: sense -> reason -> plan -> act -> reflect
+- Conditional edge from reflect: continue to sense or END based on iteration_count
+- MAX_ITERATIONS constant: 10
+- Location: `python/kri0k/agent/graph.py`
+
+**Node Functions:**
+- All nodes are async functions returning `dict[str, Any]`
+- Currently placeholder implementations (empty dict or iteration increment)
+- Location: `python/kri0k/agent/nodes/`
 
 ## Platform Requirements
 
@@ -138,4 +174,4 @@ python/
 
 ---
 
-*Stack analysis: 2025-05-14*
+*Stack analysis: 2026-05-15*
