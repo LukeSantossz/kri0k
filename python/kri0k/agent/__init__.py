@@ -4,6 +4,7 @@ This module provides the LangGraph-based autonomous agent that
 orchestrates the engagement loop: sense, reason, plan, act, reflect.
 """
 
+from kri0k.agent.graph import get_graph
 from kri0k.agent.state import AgentState
 
-__all__ = ["AgentState"]
+__all__ = ["AgentState", "get_graph"]
