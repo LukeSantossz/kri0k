@@ -56,11 +56,19 @@ def test_agent_state_has_required_fields() -> None:
 
 
 @pytest.mark.asyncio
-async def test_sense_node_returns_empty_dict() -> None:
-    """Test that sense node placeholder returns empty dict."""
+async def test_sense_node_returns_snapshot_dict() -> None:
+    """Test that sense node returns a state update with `snapshot`.
+
+    Phase 2 wiring: sense fetches `_native.get_dummy_graph()` and writes
+    the formatted snapshot to state. See `tests/test_sense_node.py` for
+    detailed coverage.
+    """
     state = _minimal_state()
     result = await sense(state)
-    assert result == {}
+    assert "snapshot" in result
+    snap = result["snapshot"]
+    assert isinstance(snap, dict)
+    assert "raw" in snap and "formatted" in snap
 
 
 @pytest.mark.asyncio
