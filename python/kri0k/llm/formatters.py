@@ -114,15 +114,32 @@ def _sanitize_value(value: Any, *, sensitive: bool = False) -> Any:
     return _truncate(_strip_fence_tokens(_strip_control_chars(repr(value))))
 
 
+def _node_kind_label(node: Any) -> str:
+    """Pick a stable, short label for a node's kind.
+
+    The Rust serializer emits `kind` as a tagged dict like
+    ``{"type": "host", "ip": "..."}``. We use the inner ``type`` field
+    when present; otherwise fall back to a plain string `kind`.
+    """
+    if not isinstance(node, Mapping):
+        return "unknown"
+    kind = node.get("kind")
+    if isinstance(kind, Mapping):
+        type_tag = kind.get("type")
+        if isinstance(type_tag, str):
+            return type_tag
+        return "unknown"
+    if isinstance(kind, str):
+        return kind
+    return "unknown"
+
+
 def _node_kind_histogram(nodes: Sequence[Any]) -> list[tuple[str, int]]:
     """Return a sorted (kind, count) list for the summary header."""
     counts: dict[str, int] = {}
     for node in nodes:
-        if isinstance(node, Mapping):
-            kind = str(node.get("kind", "unknown"))
-        else:
-            kind = "unknown"
-        counts[kind] = counts.get(kind, 0) + 1
+        label = _node_kind_label(node)
+        counts[label] = counts.get(label, 0) + 1
     return sorted(counts.items())
 
 
