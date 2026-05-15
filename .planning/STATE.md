@@ -2,9 +2,9 @@
 
 ## Status
 
-**Current Phase:** Phase 1 - LangGraph Structure
+**Current Phase:** Phase 2 - Sense + Ollama
 **Milestone:** 1 of 3 - MVP Execution Loop
-**Status:** Ready to execute (1 plan, 3 tasks)
+**Status:** Ready to plan Phase 2
 
 ## Project Reference
 
@@ -17,7 +17,7 @@ See: `.planning/PROJECT.md` (updated 2026-05-14)
 
 ```
 Milestone 1: MVP Execution Loop
-  Phase 1: LangGraph Structure    ○ Pending
+  Phase 1: LangGraph Structure    ● Complete (1/1 plans)
   Phase 2: Sense + Ollama         ○ Pending
   Phase 3: Reason + Plan          ○ Pending
   Phase 4: Act + TTP Whois        ○ Pending
@@ -40,10 +40,23 @@ Milestone 3: CLI Operational
 | Metric | Value |
 |--------|-------|
 | Phases total | 12 |
-| Phases complete | 0 |
+| Phases complete | 1 |
 | Requirements total | 42 |
-| Requirements complete | 0 |
-| Commits this milestone | 1 |
+| Requirements complete | 1 |
+| Commits this milestone | 4 |
+
+## Performance Metrics
+
+| Phase | Plan | Duration | Tasks | Files |
+|-------|------|----------|-------|-------|
+| 01 | 01 | ~8 min | 3 | 10 |
+
+## Decisions
+
+- AgentState uses TypedDict with 7 fields for mypy strict compliance
+- All nodes are async functions for future LLM/Rust integration
+- MAX_ITERATIONS=10 hardcoded for iteration control
+- Router uses named function (not lambda) per D-10
 
 ## Recent Activity
 
@@ -53,6 +66,7 @@ Milestone 3: CLI Operational
 | 2026-05-14 | Requirements defined (42 v1 requirements) |
 | 2026-05-14 | Roadmap created (12 phases, 3 milestones) |
 | 2026-05-14 | Phase 1 planned (1 plan, 3 tasks, AGENT-01) |
+| 2026-05-15 | Phase 1 Plan 01 executed (3 tasks, 10 files, AGENT-01 complete) |
 
 ## Blockers
 
@@ -66,4 +80,4 @@ None currently.
 - Fine granularity selected: 12 phases for detailed tracking
 
 ---
-*Last updated: 2026-05-14*
+*Last updated: 2026-05-15*

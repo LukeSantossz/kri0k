@@ -26,21 +26,23 @@
 
 ## Milestone 1: MVP Execution Loop (Phases 1-6)
 
-### Phase 1: LangGraph Structure
+### Phase 1: LangGraph Structure (COMPLETE)
 **Goal:** Criar estrutura base do grafo LangGraph com nos placeholder
 
-**Requirements:** AGENT-01
+**Requirements:** AGENT-01 (complete)
 
-**Plans:** 1 plan
+**Plans:** 1/1 complete
 
 Plans:
-- [ ] 01-01-PLAN.md - Create StateGraph with placeholder nodes and test coverage
+- [x] 01-01-PLAN.md - Create StateGraph with placeholder nodes and test coverage
 
 **Success Criteria:**
-1. `python/kri0k/agent/graph.py` existe com StateGraph definido
-2. Nos sense, reason, plan, act, reflect registrados no grafo
-3. Edges conectam nos na sequencia correta
-4. `pytest tests/test_agent_graph.py` passa
+1. [x] `python/kri0k/agent/graph.py` existe com StateGraph definido
+2. [x] Nos sense, reason, plan, act, reflect registrados no grafo
+3. [x] Edges conectam nos na sequencia correta
+4. [x] `pytest tests/test_agent_graph.py` passa (12 tests)
+
+**Completed:** 2026-05-15
 
 **Depends on:** None
 

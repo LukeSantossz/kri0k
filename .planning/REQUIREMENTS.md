@@ -9,7 +9,7 @@ Requirements para o MVP. Cada um mapeia a fases do roadmap.
 
 ### LangGraph Agent
 
-- [ ] **AGENT-01**: Sistema inicializa grafo LangGraph com nós sense/reason/plan/act/reflect
+- [x] **AGENT-01**: Sistema inicializa grafo LangGraph com nós sense/reason/plan/act/reflect
 - [ ] **AGENT-02**: Nó SENSE obtém snapshot JSON do grafo Rust e formata para LLM
 - [ ] **AGENT-03**: Nó REASON recebe snapshot e retorna análise estruturada do estado atual
 - [ ] **AGENT-04**: Nó PLAN propõe próxima ação como Proposal tipado (target, ttp_id, params)
@@ -116,7 +116,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| AGENT-01 | Phase 1 | Pending |
+| AGENT-01 | Phase 1 | Complete |
 | AGENT-02 | Phase 2 | Pending |
 | AGENT-03 | Phase 3 | Pending |
 | AGENT-04 | Phase 3 | Pending |
