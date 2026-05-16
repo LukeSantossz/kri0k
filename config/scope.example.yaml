@@ -28,3 +28,9 @@ metadata:
 
 # M-03: scope_hash (SHA256 of this file) will be embedded in all Snapshots
 # M-04: Fields above are non-bypassable (enforced by validator)
+
+# LLM provider configuration (Phase 2)
+# Apenas `model` é overridável (D-19). Defaults: provider=ollama,
+# model=deepseek-r1:32b, base_url=http://localhost:11434.
+llm:
+  model: deepseek-r1:32b
