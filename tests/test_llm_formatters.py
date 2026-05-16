@@ -2,11 +2,15 @@
 
 import json
 
+import pytest
+
 from kri0k.llm.formatters import (
     MAX_FIELD_BYTES,
     PROMPT_FENCE_TOKENS,
     format_snapshot_hybrid,
 )
+
+pytestmark = pytest.mark.unit
 
 
 def _extract_json_block(rendered: str) -> dict:

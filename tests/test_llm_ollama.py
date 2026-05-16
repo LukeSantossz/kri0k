@@ -15,6 +15,8 @@ from kri0k.llm.ollama import (
 )
 from kri0k.llm.rate_limit import TokenBucket
 
+pytestmark = pytest.mark.unit
+
 
 def _ok_response(content: str = "hello") -> httpx.Response:
     body = {"message": {"role": "assistant", "content": content}}

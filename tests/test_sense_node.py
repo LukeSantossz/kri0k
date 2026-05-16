@@ -9,6 +9,8 @@ import pytest
 from kri0k.agent.nodes.sense import sense
 from kri0k.agent.state import AgentState
 
+pytestmark = pytest.mark.integration
+
 
 def _state() -> AgentState:
     return AgentState(

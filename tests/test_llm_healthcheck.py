@@ -6,6 +6,8 @@ from kri0k.llm.config import LLMConfig
 from kri0k.llm.healthcheck import ping_ollama
 from kri0k.llm.ollama import LLMRetryExhaustedError
 
+pytestmark = pytest.mark.unit
+
 
 class _StubProvider:
     """Minimal LLMProvider for tests; honors the ping contract."""

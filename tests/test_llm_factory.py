@@ -8,6 +8,8 @@ import pytest
 import kri0k.llm as kllm
 from kri0k.llm import LLMConfig, OllamaProvider, build_provider
 
+pytestmark = pytest.mark.unit
+
 
 def test_factory_returns_ollama_provider() -> None:
     provider = build_provider(LLMConfig())

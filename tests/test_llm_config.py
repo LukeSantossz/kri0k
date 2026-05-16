@@ -6,6 +6,8 @@ import pytest
 
 from kri0k.llm.config import LLMConfig
 
+pytestmark = pytest.mark.unit
+
 
 def test_defaults() -> None:
     cfg = LLMConfig()

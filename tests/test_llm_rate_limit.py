@@ -6,6 +6,8 @@ import pytest
 
 from kri0k.llm.rate_limit import TokenBucket
 
+pytestmark = pytest.mark.unit
+
 
 class _Clock:
     """Manual monotonic clock for deterministic tests."""

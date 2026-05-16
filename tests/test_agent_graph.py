@@ -7,6 +7,8 @@ from kri0k.agent import AgentState, get_graph
 from kri0k.agent.graph import MAX_ITERATIONS, route_after_reflect
 from kri0k.agent.nodes import act, plan, reason, reflect, sense
 
+pytestmark = pytest.mark.graph
+
 
 def _minimal_state() -> AgentState:
     """Create a minimal AgentState with default values."""

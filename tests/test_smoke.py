@@ -1,6 +1,10 @@
 """Smoke tests for kri0k Python package."""
 
+import pytest
+
 import kri0k
+
+pytestmark = pytest.mark.integration
 
 
 def test_hello() -> None:

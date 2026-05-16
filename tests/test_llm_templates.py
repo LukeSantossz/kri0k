@@ -5,6 +5,8 @@ import pytest
 
 from kri0k.llm import templates
 
+pytestmark = pytest.mark.unit
+
 
 def test_get_env_is_lazy() -> None:
     # Ensure the cached singleton has not been built yet for this test.
