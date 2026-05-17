@@ -178,19 +178,21 @@ def extract_json(text: str) -> dict[str, Any]:
     block_match = _JSON_BLOCK_PATTERN.search(clean_text)
     if block_match:
         try:
-            result: dict[str, Any] = json.loads(block_match.group(1))
-            return result
+            parsed: dict[str, Any] = json.loads(block_match.group(1))
         except json.JSONDecodeError:
             pass  # Fall through to try raw JSON
+        else:
+            return parsed
 
     # Try raw JSON object
     obj_match = _JSON_OBJECT_PATTERN.search(clean_text)
     if obj_match:
         try:
-            result = json.loads(obj_match.group(0))
-            return result
+            parsed = json.loads(obj_match.group(0))
         except json.JSONDecodeError as e:
             raise ParseError(f"Invalid JSON: {e}") from e
+        else:
+            return parsed
 
     raise ParseError("No JSON object found in response")
 
