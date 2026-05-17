@@ -13,6 +13,15 @@ from kri0k.llm.ollama import (
     LLMRetryExhaustedError,
     OllamaProvider,
 )
+from kri0k.llm.parser import (
+    Analysis,
+    ParseError,
+    Proposal,
+    extract_json,
+    parse_analysis,
+    parse_proposal,
+    strip_think_tags,
+)
 from kri0k.llm.protocol import LLMProvider
 
 
@@ -29,14 +38,21 @@ def build_provider(config: LLMConfig) -> LLMProvider:
 
 
 __all__ = [
+    "Analysis",
     "LLMConfig",
     "LLMError",
     "LLMProvider",
     "LLMResponseError",
     "LLMRetryExhaustedError",
     "OllamaProvider",
+    "ParseError",
     "PingResult",
+    "Proposal",
     "build_provider",
+    "extract_json",
     "format_snapshot_hybrid",
+    "parse_analysis",
+    "parse_proposal",
     "ping_ollama",
+    "strip_think_tags",
 ]

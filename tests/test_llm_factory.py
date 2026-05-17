@@ -37,16 +37,23 @@ def test_chat_is_coroutine_function() -> None:
 
 def test_public_exports() -> None:
     expected = {
+        "Analysis",
         "LLMConfig",
         "LLMError",
         "LLMProvider",
         "LLMResponseError",
         "LLMRetryExhaustedError",
         "OllamaProvider",
+        "ParseError",
         "PingResult",
+        "Proposal",
         "build_provider",
+        "extract_json",
         "format_snapshot_hybrid",
+        "parse_analysis",
+        "parse_proposal",
         "ping_ollama",
+        "strip_think_tags",
     }
     assert set(kllm.__all__) == expected
     for name in expected:

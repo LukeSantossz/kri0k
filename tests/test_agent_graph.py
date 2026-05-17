@@ -75,19 +75,21 @@ async def test_sense_node_returns_snapshot_dict() -> None:
 
 
 @pytest.mark.asyncio
-async def test_reason_node_returns_empty_dict() -> None:
-    """Test that reason node placeholder returns empty dict."""
+async def test_reason_node_returns_analysis_dict() -> None:
+    """Test that reason node returns analysis dict (no LLM = graceful fallback)."""
     state = _minimal_state()
     result = await reason(state)
-    assert result == {}
+    assert "analysis" in result
+    assert isinstance(result["analysis"], dict)
 
 
 @pytest.mark.asyncio
-async def test_plan_node_returns_empty_dict() -> None:
-    """Test that plan node placeholder returns empty dict."""
+async def test_plan_node_returns_proposal_dict() -> None:
+    """Test that plan node returns proposal dict (no LLM = graceful fallback)."""
     state = _minimal_state()
     result = await plan(state)
-    assert result == {}
+    assert "proposal" in result
+    assert isinstance(result["proposal"], dict)
 
 
 @pytest.mark.asyncio
