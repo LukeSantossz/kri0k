@@ -71,7 +71,7 @@ fn get_dummy_graph(py: Python<'_>) -> PyResult<Py<PyAny>> {
 
     // Convert JSON value to Python dict
     let json_str = serde_json::to_string(&json_value).expect("Failed to stringify JSON");
-    let json_module = py.import_bound("json")?;
+    let json_module = py.import("json")?;
     let loads_fn = json_module.getattr("loads")?;
     let result = loads_fn.call1((json_str,))?;
     Ok(result.into())

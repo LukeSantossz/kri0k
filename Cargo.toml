@@ -7,7 +7,8 @@ members = [
 ]
 
 [workspace.package]
-rust-version = "1.75.0"
+# MSRV: indexmap 2.14+ requires 1.85
+rust-version = "1.85.0"
 edition = "2021"
 license = "MIT"  # TODO(KRK-LICENSE): Finalize with ethical clause per ADR-0010
 
@@ -16,7 +17,7 @@ serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 thiserror = "1.0"
 tokio = { version = "1.40", features = ["rt", "rt-multi-thread", "macros"] }
-pyo3 = { version = "0.22", features = ["extension-module"] }
+pyo3 = { version = "0.24", features = ["extension-module"] }
 petgraph = { version = "0.6", features = ["serde-1"] }
 ulid = { version = "1.1", features = ["serde"] }
 
