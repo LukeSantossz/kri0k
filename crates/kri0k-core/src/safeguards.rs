@@ -39,12 +39,12 @@ impl SafeguardsConfig {
     /// Activate the kill switch (M-36).
     ///
     /// This immediately halts all operations.
-    pub fn activate_kill_switch(&mut self) {
+    pub const fn activate_kill_switch(&mut self) {
         self.kill_switch_active = true;
     }
 
     /// Deactivate the kill switch (requires explicit action).
-    pub fn deactivate_kill_switch(&mut self) {
+    pub const fn deactivate_kill_switch(&mut self) {
         self.kill_switch_active = false;
     }
 }

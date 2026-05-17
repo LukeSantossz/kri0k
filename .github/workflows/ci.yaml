@@ -179,7 +179,7 @@ jobs:
 
   # MSRV check (Minimum Supported Rust Version)
   msrv:
-    name: MSRV (Rust 1.83.0)
+    name: MSRV (Rust 1.85.0)
     runs-on: ubuntu-latest
 
     steps:
@@ -191,10 +191,10 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Install Rust 1.83.0
+      - name: Install Rust 1.85.0
         uses: dtolnay/rust-toolchain@master
         with:
-          toolchain: "1.83.0"
+          toolchain: "1.85.0"
 
       - name: Check build
         # Exclude pybridge from MSRV check (built via maturin)
