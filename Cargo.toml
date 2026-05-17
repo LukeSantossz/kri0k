@@ -7,7 +7,8 @@ members = [
 ]
 
 [workspace.package]
-rust-version = "1.75.0"
+# MSRV: indexmap 2.14+ requires 1.83, petgraph pulls it in
+rust-version = "1.83.0"
 edition = "2021"
 license = "MIT"  # TODO(KRK-LICENSE): Finalize with ethical clause per ADR-0010
 
