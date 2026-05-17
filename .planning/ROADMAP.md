@@ -70,15 +70,22 @@ Plans:
 
 ---
 
-### Phase 3: Reason + Plan Nodes
+### Phase 3: Reason + Plan Nodes (COMPLETE)
 **Goal:** LLM analisa estado e propoe proxima acao
 
-**Requirements:** AGENT-03, AGENT-04
+**Requirements:** AGENT-03, AGENT-04, LLM-03 (complete)
+
+**Plans:** 1/1 complete
+
+Plans:
+- [x] 03-01-PLAN.md - Implement reason/plan nodes with LLM and parser
 
 **Success Criteria:**
-1. Reason node retorna analise estruturada (JSON schema validado)
-2. Plan node retorna Proposal com campos target, ttp_id, params
-3. Proposal e tipo Python dataclass compativel com Rust struct
+1. [x] Reason node retorna analise estruturada (JSON schema validado)
+2. [x] Plan node retorna Proposal com campos target, ttp_id, params
+3. [x] Proposal e tipo Python dataclass compativel com Rust struct
+
+**Completed:** 2026-05-16
 
 **Depends on:** Phase 2
 
