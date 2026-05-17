@@ -61,9 +61,7 @@ class Proposal:
         if not isinstance(data["params"], dict):
             raise ParseError(f"params must be dict, got {type(data['params']).__name__}")
         if not isinstance(data["rationale"], str):
-            raise ParseError(
-                f"rationale must be str, got {type(data['rationale']).__name__}"
-            )
+            raise ParseError(f"rationale must be str, got {type(data['rationale']).__name__}")
 
         return cls(
             target=data["target"],
@@ -118,9 +116,7 @@ class Analysis:
                 f"priority_targets must be list, got {type(data['priority_targets']).__name__}"
             )
         if not isinstance(data["reasoning"], str):
-            raise ParseError(
-                f"reasoning must be str, got {type(data['reasoning']).__name__}"
-            )
+            raise ParseError(f"reasoning must be str, got {type(data['reasoning']).__name__}")
 
         return cls(
             observations=[str(o) for o in data["observations"]],
