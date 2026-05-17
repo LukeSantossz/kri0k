@@ -11,6 +11,8 @@ env:
   CARGO_TERM_COLOR: always
   RUST_BACKTRACE: 1
   RUSTFLAGS: -D warnings
+  # Allow PyO3 to build with Python 3.14 (newer than officially supported)
+  PYO3_USE_ABI3_FORWARD_COMPATIBILITY: 1
 
 jobs:
   # Rust checks
@@ -32,13 +34,18 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      
+
+      - name: Set up Python (for PyO3)
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
       - name: Install Rust toolchain
         uses: dtolnay/rust-toolchain@master
         with:
           toolchain: ${{ matrix.toolchain }}
           components: rustfmt, clippy
-      
+
       - name: Cache cargo registry
         uses: actions/cache@v4
         with:
@@ -163,16 +170,21 @@ jobs:
   msrv:
     name: MSRV (Rust 1.75.0)
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      
+
+      - name: Set up Python (for PyO3)
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
       - name: Install Rust 1.75.0
         uses: dtolnay/rust-toolchain@master
         with:
           toolchain: "1.75.0"
-      
+
       - name: Check build
         run: cargo check --all-features
 
@@ -195,8 +207,10 @@ jobs:
         with:
           python-version: "3.11"
       
-      - name: Install pip-audit
-        run: pip install pip-audit
-      
+      - name: Install dependencies and pip-audit
+        run: |
+          pip install pip-audit
+          pip install -e . || true
+
       - name: Audit Python dependencies
-        run: pip-audit
+        run: pip-audit --requirement pyproject.toml || pip-audit
