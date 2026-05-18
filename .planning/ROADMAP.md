@@ -108,7 +108,7 @@ Plans:
 - [x] 04-04-PLAN.md - ScopeConfig parser (lookahead v1 schema) + allowlist exact-match + SHA-256 hash + scope.example.yaml (Wave 2)
 
 **Wave 3** *(blocked on Wave 2 completion)*
-- [ ] 04-05-PLAN.md - Engagement pyclass + Python wiring (engagement.py, act.py, sense.py) + tests + docs (Wave 3)
+- [x] 04-05-PLAN.md - Engagement pyclass + Python wiring (engagement.py, act.py, sense.py) + tests + docs (Wave 3)
 
 **Success Criteria:**
 1. TTP whois implementa trait `Ttp` em `crates/kri0k-core/src/ttp/whois.rs`
