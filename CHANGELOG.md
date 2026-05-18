@@ -41,6 +41,9 @@ Todas as mudanças notáveis ao projeto kri0k. Formato baseado em [Keep a Change
 - M-36 (kill switch): covered — `CancellationToken` + fail-fast `which::which` em startup (wrapped em `py.allow_threads` per Pitfall 7).
 - AB-03 (prompt injection out-of-scope): covered — defense in depth D-63 (Layer 1 allowlist + Layer 2 regex domain validation + Layer 3 `Command::arg` sem shell).
 
+### Known Limitations
+- **Dedupe cache unbounded (T-04-05-10):** O `HashMap<(kind_tag, natural_key), NodeId>` interno do `Engagement` cresce indefinidamente enquanto o engagement estiver vivo. Aceitável em Phase 4 (MVP single-engagement, short-lived; bounded por `|targets × kinds|`). TTL / eviction policy ficam para Phase 5+ se engagements long-running forem necessários. Documentado em `.planning/phases/04-act-node-ttp-whois/04-SECURITY.md` (Accepted Risks Log).
+
 ## [0.1.0] - 2026-05-16 (Phases 1-3)
 - Phase 1: LangGraph structure base.
 - Phase 2: Sense node + Ollama provider.
