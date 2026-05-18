@@ -100,7 +100,7 @@ Plans:
 
 Plans:
 **Wave 1**
-- [ ] 04-01-PLAN.md - Graph data model: NodeKind Domain/Organization/Nameserver + EdgeKind RegisteredBy/HasNameserver (Wave 1)
+- [x] 04-01-PLAN.md - Graph data model: NodeKind Domain/Organization/Nameserver + EdgeKind RegisteredBy/HasNameserver (Wave 1)
 - [ ] 04-02-PLAN.md - Error taxonomy + Cargo deps (tokio-util, which, async-trait, tracing, serde_yaml_ng) + NoopAuditSink rename (Wave 1)
 
 **Wave 2** *(blocked on Wave 1 completion)*

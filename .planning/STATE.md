@@ -2,37 +2,31 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-current_phase: Phase 4 - Act + TTP Whois
-status: ready_to_execute
-last_updated: "2026-05-18T12:00:00.000Z"
+current_phase: 4
+status: executing
+last_updated: "2026-05-18T00:00:00.000Z"
 progress:
   total_phases: 12
   completed_phases: 3
-  total_plans: 8
-  completed_plans: 3
-  percent: 38
-session:
-  stopped_at: "Phase 4 planned (5 plans across 3 waves, 12+ tasks, decision-coverage gap accepted)"
-  resume_file: ".planning/phases/04-act-node-ttp-whois/04-05-PLAN.md"
-  next_command: "/gsd-execute-phase 4"
-overrides:
-  - decision_coverage_gap_accepted: "Phase 4 — 16 D-XX decisions not literally cited; semantic coverage verified via plan-checker"
+  total_plans: 6
+  completed_plans: 4
+  percent: 25
 ---
 
 # Project State: kri0k
 
 ## Status
 
-**Current Phase:** Phase 4 - Act + TTP Whois
+**Current Phase:** 4
 **Milestone:** 1 of 3 - MVP Execution Loop
-**Status:** Phase 4 planned (5 plans, 3 waves) — ready for `/gsd-execute-phase 4`
+**Status:** Executing Phase 4
 
 ## Project Reference
 
 See: `.planning/PROJECT.md` (updated 2026-05-14)
 
 **Core value:** Execução segura e auditável de técnicas ofensivas
-**Current focus:** MVP Execution Loop
+**Current focus:** Phase 4 — Act Node + TTP Whois
 
 ## Progress
 
@@ -41,8 +35,7 @@ Milestone 1: MVP Execution Loop
   Phase 1: LangGraph Structure    ● Complete (1/1 plans)
   Phase 2: Sense + Ollama         ● Complete (1/1 plans)
   Phase 3: Reason + Plan          ● Complete (1/1 plans)
-  Phase 4: Act + TTP Whois        ○ Pending
-  Phase 4: Act + TTP Whois        ○ Pending
+  Phase 4: Act + TTP Whois        ◑ In Progress (1/5 plans)
   Phase 5: Reflect                ○ Pending
   Phase 6: Loop Integration       ○ Pending
 
@@ -74,6 +67,7 @@ Milestone 3: CLI Operational
 | 01 | 01 | ~8 min | 3 | 10 |
 | 02 | 01 | ~15 min | 8 | 12 |
 | 03 | 01 | ~10 min | 6 | 11 |
+| 04 | 01 | ~5 min | 2 | 1 |
 
 ## Decisions
 
@@ -81,6 +75,7 @@ Milestone 3: CLI Operational
 - All nodes are async functions for future LLM/Rust integration
 - MAX_ITERATIONS=10 hardcoded for iteration control
 - Router uses named function (not lambda) per D-10
+- NodeKind/EdgeKind enums extended with whois domain types (D-39/D-40); serde snake_case tagged
 
 ## Recent Activity
 
@@ -100,6 +95,7 @@ Milestone 3: CLI Operational
 | 2026-05-18 | Phase 4 research + validation strategy + pattern map produced |
 | 2026-05-18 | Phase 4 planned: 5 plans across 3 waves, plan-checker passed after 1 revision iteration (5 BLOCKERS + 3 WARNINGS resolved) |
 | 2026-05-18 | Fixed `~/.claude/settings.json` global bash hooks: `Program Files` path replaced with 8.3 short path `PROGRA~1` to avoid "cannot execute binary file" |
+| 2026-05-18 | Phase 4 Plan 01 executed: NodeKind (Domain/Organization/Nameserver) + EdgeKind (RegisteredBy/HasNameserver) added to kri0k-graph; 13 tests pass, clippy strict green |
 
 ## Blockers
 
