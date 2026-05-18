@@ -71,63 +71,25 @@
 
 > A primeira task listada é a ativa. O agente trabalha nela até conclusão, descarte ou bloqueio.
 
-### TASK-015
-- **Status:** em andamento
-- **Modo:** desenvolvimento
-- **Complexidade:** major
-- **Data de criação:** 2026-05-18
-
-#### Objetivo (!obrigatório)
-Implementar Phase 4 (Act Node + TTP Whois): primeiro TTP concreto (T1590.001 whois) executável via subprocess, expondo `Engagement` pyclass como container canônico de estado, fechando o loop sense→reason→plan→act→reflect do agente LangGraph.
-
-#### Contexto (!obrigatório)
-Phase 4 do roadmap GSD (MVP Execution Loop, Milestone 1). Implementa AGENT-05 + TTP-01..05. Pré-requisitos: Phases 1-3 já estão em master. Branch dedicada `feat/phase-4-act-ttp-whois` criada. Pré-req runtime: `whois.exe` (Sysinternals v1.21) instalado via winget. Plans GSD: `.planning/phases/04-act-node-ttp-whois/04-{01..05}-PLAN.md` (29 decisões D-34..D-64 lockadas em CONTEXT.md; RESEARCH.md cobre 16 áreas técnicas com 13 pitfalls verificados).
-
-#### Escopo Técnico (!obrigatório)
-- **Arquivos/módulos envolvidos:**
-  - Rust: `crates/kri0k-graph/src/lib.rs` (NodeKind+EdgeKind), `crates/kri0k-core/{Cargo.toml,src/{lib,audit,scope}.rs}`, `crates/kri0k-core/src/ttp/{mod,subprocess,whois}.rs` (novos), `crates/kri0k-pybridge/{Cargo.toml,src/lib.rs,tests/engagement_missing_whois.rs}`
-  - Python: `python/kri0k/{_native.pyi, engagement.py, agent/nodes/{act,sense}.py}`
-  - Tests: `tests/{test_act_node, test_engagement_smoke}.py`, `tests/fixtures/whois_{google_com,example_com,invalid}.txt`, fixtures espelhadas em `crates/kri0k-core/tests/fixtures/`
-  - Docs: `README.md` (Running whois TTP), `CONTRIBUTING.md` (Adding a new TTP), `CHANGELOG.md` (0.2.0), `docs/adr/ADR-0013-ttp-trait-subprocess-abstraction.md`
-  - Config: `config/scope.example.yaml` (v1 schema completo), `Cargo.toml` workspace (deps), `.claude/tasks.md` (esta task)
-- **Dependências necessárias:** Rust — `tokio` (process, time, sync), `tokio-util = "0.7"`, `which = "8"`, `async-trait = "0.1"`, `tracing = "0.1"`, `serde_yaml_ng = "0.10"`, `regex = "1"`, dev: `temp-env = "0.3"`. Python — nenhuma nova (já tem ollama, httpx, pyyaml, jinja2).
-- **Impacto em funcionalidades existentes:** Refactor do trait `Ttp` síncrono → async (cirúrgico — métodos hoje são `todo!()`). Sense node ganha branch backward-compat para usar `engagement.snapshot()` quando presente em `engagement_context`. Demais funcionalidades de Phases 1-3 (LLM, parser, reason/plan) permanecem intactas.
-
-#### Critérios de Aceite (!obrigatório)
-- [ ] ROADMAP Phase 4 critério 1: `crates/kri0k-core/src/ttp/whois.rs` existe com `impl Ttp for WhoisTtp`
-- [ ] ROADMAP Phase 4 critério 2: `whois example.com` retorna `WhoisOutput { registrar, nameservers, dates, ... }` populado
-- [ ] ROADMAP Phase 4 critério 3: `Engagement::execute_proposal` adiciona ≥1 Domain + ≥1 Organization + N Nameserver nodes ao grafo
-- [ ] ROADMAP Phase 4 critério 4: 2 chamadas consecutivas de `WhoisTtp::execute` levam ≥1.0s wall-clock (rate limit)
-- [ ] CONTEXT D-64.2: `cargo clippy --workspace --all-targets -- -D warnings` zero issues
-- [ ] CONTEXT D-64.3: `ruff check python/ tests/` + `mypy python/kri0k` strict zero issues
-- [ ] CONTEXT D-64.4: `cargo test --workspace --features integration` + `pytest tests/` 100% pass
-- [ ] CONTEXT D-64.5: README/CONTRIBUTING/CHANGELOG/ADR-0013 entregues
-- [ ] CONTEXT D-64.6: Tabela M-XX em CONTEXT.md/VERIFICATION.md marcada com Covered/Partial/N/A
-- [ ] Plans 04-01 a 04-05 todos com `<verify>` automated commands passando
-
-#### Restrições (opcional)
-- Plataforma: Windows 11 com `whois.exe` Sysinternals (não nativo Linux). Args list obrigatório: `["-v", "-nobanner", "-accepteula", target]` (Pitfalls 1+2 verificados).
-- Commits: Conventional Commits, uma linha, sem body, sem `Co-authored-by` (CLAUDE.md raiz).
-- Branch: `feat/phase-4-act-ttp-whois` (já criada e ativa).
-- Pitfalls críticos (RESEARCH.md): #1+2 (whois flags), #5 (Mutex<Box<dyn AuditSink>>), #6 (#[async_trait]), #7 (py.allow_threads no #[new]), #9 (serde_yaml_ng).
-
-#### Referências (opcional)
-- `.planning/phases/04-act-node-ttp-whois/04-CONTEXT.md` — 29 decisões locked
-- `.planning/phases/04-act-node-ttp-whois/04-RESEARCH.md` — patterns + crates + pitfalls
-- `.planning/phases/04-act-node-ttp-whois/04-PATTERNS.md` — analog map por arquivo
-- `.planning/phases/04-act-node-ttp-whois/04-VALIDATION.md` — per-task verification map
-- `.planning/phases/04-act-node-ttp-whois/04-{01..05}-PLAN.md` — planos detalhados
-- Branch: `feat/phase-4-act-ttp-whois`
-- Pré-req: `whois.exe` v1.21 (Sysinternals) instalado via winget
-
-#### Log de Andamento (atualizado pelo agente)
-| Data | Sessão | Ação Realizada | Status ao Final |
-|------|--------|----------------|-----------------|
-| 2026-05-18 | init | TASK-015 aberta; pré-reqs validados (whois.exe instalado, branch criada, plans verificados); /gsd-execute-phase 4 iniciado | em andamento |
+_(nenhuma task ativa — última conclusão: TASK-015 em 2026-05-18)_
 
 ## Tasks Concluídas
 
 > Movidas para cá após conclusão e atualização do `registry.md`. Nunca remova entradas.
+
+### TASK-015 | major (concluída 2026-05-18) — Phase 4: Act Node + TTP Whois
+
+- **Objetivo:** Implementar Phase 4 (T1590.001 whois) e expor `Engagement` pyclass como container canônico de estado, fechando o loop sense→reason→plan→act→reflect.
+- **Branch:** `feat/phase-4-act-ttp-whois` (6 commits ahead de master, aguardando PR per D-59)
+- **Plans GSD executados (5/5):** 04-01 NodeKind/EdgeKind · 04-02 Error+deps · 04-03 WhoisTtp+Subprocess · 04-04 ScopeConfig · 04-05 Engagement+wiring+docs
+- **Commits do plan 04-05:** `8fc8877` (Task 1 pyclass) · `c281f77` (Task 2 stubs+bootstrap) · `81e5e05` (Task 3 act/sense) · `7e7bd96` (Task 4 tests) · `0b35479` (Task 5 docs) · `5949170` (meta-state wrap-up)
+- **Avaliação pós-implementação:** aprovado — cargo test workspace 65/65 ✅, clippy strict zero issues, ruff+mypy strict zero issues, pytest unit 104 pass, pytest integration 8/8 pass com whois real (67s)
+- **Requisitos completados:** AGENT-05, TTP-04. D-63 defense-in-depth L1+L2+L3 covered. M-02/M-03/M-05/M-15/M-34/M-36/AB-03 todos covered.
+- **Lições:**
+  1. Trabalho draft pré-existente em `lib.rs` foi refatorado 100% para o plano em vez de adaptar — escolha do usuário que evitou divergência documentada futura.
+  2. Plan typo `Error::ParseError { source }` corrigido em runtime para `origin` (campo real do `thiserror` enum).
+  3. `maturin develop` é mandatório após mudanças em cdylib antes de qualquer pytest que importe `_native` (smoke tests inicialmente falhavam por `.pyd` antigo sem a class `Engagement`).
+- **Próximo passo (fora desta task):** `/gsd-verify-work 4` + PR `feat/phase-4-act-ttp-whois → master` per D-59.
 
 ### Phase 2 — Sense Node + Ollama Provider (concluída 2026-05-15)
 
