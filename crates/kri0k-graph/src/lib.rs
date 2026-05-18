@@ -31,6 +31,21 @@ pub enum NodeKind {
         /// Human-readable description.
         description: String,
     },
+    /// Domain name (e.g., "example.com") — natural key for whois targets.
+    Domain {
+        /// Fully-qualified domain name.
+        name: String,
+    },
+    /// Organization name extracted from whois Registrant Organization (D-42).
+    Organization {
+        /// Organization name as reported by whois.
+        name: String,
+    },
+    /// Nameserver hostname (e.g., "ns1.example.com") — case-insensitive natural key.
+    Nameserver {
+        /// Nameserver hostname.
+        hostname: String,
+    },
 }
 
 /// Edge kind enumeration.
@@ -46,6 +61,10 @@ pub enum EdgeKind {
         /// Type of relationship.
         relation: String,
     },
+    /// Domain -> Organization edge: domain is registered by this organization (D-39).
+    RegisteredBy,
+    /// Domain -> Nameserver edge: domain delegates DNS to this nameserver (D-39).
+    HasNameserver,
 }
 
 /// Node in the graph.
@@ -200,6 +219,91 @@ impl Default for Graph {
 #[allow(clippy::expect_used)] // expect is ok in tests
 mod tests {
     use super::*;
+
+    // --- NodeKind new variant tests (Task 1) ---
+
+    #[test]
+    fn test_node_kind_domain_serialization() {
+        let kind = NodeKind::Domain {
+            name: "example.com".into(),
+        };
+        let value = serde_json::to_value(&kind).expect("serialize");
+        assert_eq!(value, serde_json::json!({"type": "domain", "name": "example.com"}));
+    }
+
+    #[test]
+    fn test_node_kind_organization_serialization() {
+        let kind = NodeKind::Organization {
+            name: "Example Inc.".into(),
+        };
+        let value = serde_json::to_value(&kind).expect("serialize");
+        assert_eq!(value, serde_json::json!({"type": "organization", "name": "Example Inc."}));
+    }
+
+    #[test]
+    fn test_node_kind_nameserver_serialization() {
+        let kind = NodeKind::Nameserver {
+            hostname: "ns1.example.com".into(),
+        };
+        let value = serde_json::to_value(&kind).expect("serialize");
+        assert_eq!(value, serde_json::json!({"type": "nameserver", "hostname": "ns1.example.com"}));
+    }
+
+    #[test]
+    fn test_node_kind_deserialization_roundtrip() {
+        let variants: Vec<NodeKind> = vec![
+            NodeKind::Domain { name: "example.com".into() },
+            NodeKind::Organization { name: "Example Inc.".into() },
+            NodeKind::Nameserver { hostname: "ns1.example.com".into() },
+        ];
+        for kind in variants {
+            let serialized = serde_json::to_value(&kind).expect("serialize");
+            let deserialized: NodeKind = serde_json::from_value(serialized).expect("deserialize");
+            assert_eq!(deserialized, kind);
+        }
+    }
+
+    #[test]
+    fn test_node_kind_existing_variants_still_work() {
+        let kind = NodeKind::Host { ip: "1.2.3.4".into() };
+        let value = serde_json::to_value(&kind).expect("serialize");
+        assert_eq!(value, serde_json::json!({"type": "host", "ip": "1.2.3.4"}));
+    }
+
+    // --- EdgeKind new variant tests (Task 2) ---
+
+    #[test]
+    fn test_edge_kind_registered_by_serialization() {
+        let kind = EdgeKind::RegisteredBy;
+        let value = serde_json::to_value(&kind).expect("serialize");
+        assert_eq!(value, serde_json::json!({"type": "registered_by"}));
+    }
+
+    #[test]
+    fn test_edge_kind_has_nameserver_serialization() {
+        let kind = EdgeKind::HasNameserver;
+        let value = serde_json::to_value(&kind).expect("serialize");
+        assert_eq!(value, serde_json::json!({"type": "has_nameserver"}));
+    }
+
+    #[test]
+    fn test_edge_kind_new_variants_roundtrip() {
+        let variants: Vec<EdgeKind> = vec![EdgeKind::RegisteredBy, EdgeKind::HasNameserver];
+        for kind in variants {
+            let serialized = serde_json::to_value(&kind).expect("serialize");
+            let deserialized: EdgeKind = serde_json::from_value(serialized).expect("deserialize");
+            assert_eq!(deserialized, kind);
+        }
+    }
+
+    #[test]
+    fn test_edge_kind_existing_variants_still_work() {
+        let kind = EdgeKind::BelongsTo;
+        let value = serde_json::to_value(&kind).expect("serialize");
+        assert_eq!(value, serde_json::json!({"type": "belongs_to"}));
+    }
+
+    // --- Graph tests (existing) ---
 
     #[test]
     fn test_graph_creation() {
