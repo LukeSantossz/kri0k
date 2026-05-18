@@ -104,7 +104,7 @@ Plans:
 - [x] 04-02-PLAN.md - Error taxonomy + Cargo deps (tokio-util, which, async-trait, tracing, serde_yaml_ng) + NoopAuditSink rename (Wave 1)
 
 **Wave 2** *(blocked on Wave 1 completion)*
-- [ ] 04-03-PLAN.md - TTP module promotion to async + Subprocess abstraction + WhoisTtp + parser + fixtures (Wave 2)
+- [x] 04-03-PLAN.md - TTP module promotion to async + Subprocess abstraction + WhoisTtp + parser + fixtures (Wave 2)
 - [ ] 04-04-PLAN.md - ScopeConfig parser (lookahead v1 schema) + allowlist exact-match + SHA-256 hash + scope.example.yaml (Wave 2)
 
 **Wave 3** *(blocked on Wave 2 completion)*

@@ -9,7 +9,7 @@ progress:
   total_phases: 12
   completed_phases: 3
   total_plans: 6
-  completed_plans: 5
+  completed_plans: 6
   percent: 29
 ---
 
@@ -35,7 +35,7 @@ Milestone 1: MVP Execution Loop
   Phase 1: LangGraph Structure    ● Complete (1/1 plans)
   Phase 2: Sense + Ollama         ● Complete (1/1 plans)
   Phase 3: Reason + Plan          ● Complete (1/1 plans)
-  Phase 4: Act + TTP Whois        ◑ In Progress (2/5 plans)
+  Phase 4: Act + TTP Whois        ◑ In Progress (3/5 plans)
   Phase 5: Reflect                ○ Pending
   Phase 6: Loop Integration       ○ Pending
 
@@ -69,6 +69,7 @@ Milestone 3: CLI Operational
 | 03 | 01 | ~10 min | 6 | 11 |
 | 04 | 01 | ~5 min | 2 | 1 |
 | 04 | 02 | ~10 min | 2 | 4 |
+| 04 | 03 | ~35 min | 2 | 9 |
 
 ## Decisions
 
@@ -79,6 +80,9 @@ Milestone 3: CLI Operational
 - NodeKind/EdgeKind enums extended with whois domain types (D-39/D-40); serde snake_case tagged
 - ParseError field renamed 'source' -> 'origin' to avoid thiserror field-named-source conflict
 - NoopAuditSink (D-38): Box<dyn AuditSink + Send> inside Mutex confirmed Sync (PyO3 Pitfall 5+12)
+- Ttp trait uses &'static str for id/description (clippy unnecessary_literal_bound)
+- MockSubprocess::hanging uses tokio::select! biased internally (cancel > timeout > pending)
+- Whois fixtures captured live; example.com converted from ISO-8859-1 to UTF-8 (Windows locale)
 
 ## Recent Activity
 
@@ -100,6 +104,7 @@ Milestone 3: CLI Operational
 | 2026-05-18 | Fixed `~/.claude/settings.json` global bash hooks: `Program Files` path replaced with 8.3 short path `PROGRA~1` to avoid "cannot execute binary file" |
 | 2026-05-18 | Phase 4 Plan 01 executed: NodeKind (Domain/Organization/Nameserver) + EdgeKind (RegisteredBy/HasNameserver) added to kri0k-graph; 13 tests pass, clippy strict green |
 | 2026-05-18 | Phase 4 Plan 02 executed: Error enum expanded to 10 variants (D-53/D-62); 7 workspace deps added; NoopAuditSink renamed (D-38); 13 kri0k-core tests pass, clippy strict green |
+| 2026-05-18 | Phase 4 Plan 03 executed: async Ttp trait + Subprocess abstraction + WhoisTtp (T1590.001) + heuristic parser + 3 fixtures; 26 tests pass (unit + integration), clippy strict green |
 
 ## Blockers
 
