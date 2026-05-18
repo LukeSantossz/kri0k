@@ -100,6 +100,74 @@ A ambição é explorar orquestração de ataques com um **grafo de estado persi
 
 ---
 
+## Running the whois TTP
+
+Phase 4 entrega a primeira TTP concreta do kri0k: `T1590.001` (whois reconnaissance via subprocess).
+
+### Pré-requisito
+
+- **Windows:** `winget install Microsoft.Sysinternals.Whois`
+- **Linux:** `apt install whois`
+- **Primeira execução:** rode `whois -accepteula -nobanner example.com` uma vez para aceitar a EULA do Sysinternals. Subsequentes não prompt.
+
+`Engagement::new()` faz fail-fast com `RuntimeError` se o binário não estiver no `PATH`.
+
+### scope.yaml mínimo
+
+Veja `config/scope.example.yaml`. Para uma execução real (não propose-only):
+
+```yaml
+version: 1
+operator: you@example.com
+targets:
+  - example.com
+safeguards:
+  propose_only: false
+```
+
+### Exemplo end-to-end (Python)
+
+```python
+import asyncio
+import yaml
+
+from kri0k.agent import get_graph
+from kri0k.engagement import create
+from kri0k.agent.state import AgentState
+
+
+async def main() -> None:
+    with open("config/scope.example.yaml") as f:
+        scope_dict = yaml.safe_load(f)
+
+    context = create(scope_dict, objective="recon example.com", propose_only=False)
+    graph = get_graph()
+    state: AgentState = {
+        "snapshot": {"raw": {}, "formatted": ""},
+        "analysis": {},
+        "proposal": {"ttp_id": "T1590.001", "target": "example.com"},
+        "decision": {},
+        "iteration_count": 1,
+        "history": [],
+        "engagement_context": context,
+    }
+    result = await graph.ainvoke(state)
+    print(result["decision"])
+
+
+if __name__ == "__main__":
+    asyncio.run(main())
+```
+
+### Limitações conhecidas (Phase 4)
+
+- Allowlist exact-match domínio apenas (D-48). CIDR e wildcards (`*.example.com`) chegam em Phase 7.
+- Audit log é no-op (D-38). Hash-chained JSONL chega em Phase 8.
+- Sem TUI interativa. Aprovação via flag `propose_only`. Keybindings TUI chegam em Phase 11.
+- TLDs não-ICANN (`.br`, `.uk`) podem ter parse parcial (D-41). Ver `WhoisOutput.raw_unparsed`.
+
+---
+
 ## Inspirações
 
 - Arquiteturas de agentes com grafo de estado persistente (LangGraph)

@@ -652,6 +652,52 @@ The PR template (`.github/PULL_REQUEST_TEMPLATE.md`) includes:
 
 ---
 
+## Adding a new TTP
+
+O kri0k abstrai TTPs atrás de um trait async (`kri0k_core::ttp::Ttp`) e injeta o subprocess via `Subprocess` trait (ADR-0013). Pattern para adicionar nova TTP:
+
+### 1. Implementar o struct + impl
+
+Em `crates/kri0k-core/src/ttp/<seu_ttp>.rs`:
+
+- Struct `MyTtp { subprocess: Arc<dyn Subprocess>, /* rate limit state */ }`
+- `#[async_trait] impl Ttp for MyTtp` com `id()`, `description()`, `rate_limits()`, `default_timeout()`, `async fn execute(target, cancel)`.
+
+Reuse `WhoisTtp` (`crates/kri0k-core/src/ttp/whois.rs`) como referência. Sempre passar `cancel.clone()` ao subprocess.
+
+### 2. Registrar no Engagement
+
+Em `crates/kri0k-pybridge/src/lib.rs`, dentro de `Engagement::new()`:
+
+```rust
+registry.insert("MITRE.ID".to_string(), Box::new(MyTtp::new(subprocess.clone())));
+```
+
+Quando o registry tiver >= 5 TTPs, refatorar para auto-discovery via crate `inventory` (deferido em D-52).
+
+### 3. Capturar fixture + testes
+
+1. Rode o binário externo manualmente, capture stdout para `tests/fixtures/<ttp>_<target>.txt`.
+2. Duplique em `crates/kri0k-core/tests/fixtures/` (Pitfall 13 — path do cargo).
+3. Unit tests inline em `<seu_ttp>.rs` usando `MockSubprocess::from_fixture(...)`. Cobertura mínima: `parses_<target>`, `rate_limit_enforced`, `cancellation_returns_cancelled`.
+4. Integration test gated por `#[cfg(feature = "integration")]` para o binary real.
+
+### 4. Validação
+
+```bash
+cargo test --workspace                             # unit only (CI default)
+cargo test --workspace --features integration      # + binary real (local/nightly)
+cargo clippy --workspace --all-targets -- -D warnings
+```
+
+### 5. Documentar
+
+- `CHANGELOG.md`: entry sob próxima versão.
+- `README.md` "Running ..." section se aplicável.
+- ADR novo se a TTP introduzir pattern arquitetural.
+
+---
+
 ## Questions?
 
 Open an issue or discussion on GitHub: https://github.com/LukeSantossz/kri0k
