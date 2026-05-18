@@ -9,8 +9,8 @@ progress:
   total_phases: 12
   completed_phases: 3
   total_plans: 6
-  completed_plans: 4
-  percent: 25
+  completed_plans: 5
+  percent: 29
 ---
 
 # Project State: kri0k
@@ -35,7 +35,7 @@ Milestone 1: MVP Execution Loop
   Phase 1: LangGraph Structure    ● Complete (1/1 plans)
   Phase 2: Sense + Ollama         ● Complete (1/1 plans)
   Phase 3: Reason + Plan          ● Complete (1/1 plans)
-  Phase 4: Act + TTP Whois        ◑ In Progress (1/5 plans)
+  Phase 4: Act + TTP Whois        ◑ In Progress (2/5 plans)
   Phase 5: Reflect                ○ Pending
   Phase 6: Loop Integration       ○ Pending
 
@@ -68,6 +68,7 @@ Milestone 3: CLI Operational
 | 02 | 01 | ~15 min | 8 | 12 |
 | 03 | 01 | ~10 min | 6 | 11 |
 | 04 | 01 | ~5 min | 2 | 1 |
+| 04 | 02 | ~10 min | 2 | 4 |
 
 ## Decisions
 
@@ -76,6 +77,8 @@ Milestone 3: CLI Operational
 - MAX_ITERATIONS=10 hardcoded for iteration control
 - Router uses named function (not lambda) per D-10
 - NodeKind/EdgeKind enums extended with whois domain types (D-39/D-40); serde snake_case tagged
+- ParseError field renamed 'source' -> 'origin' to avoid thiserror field-named-source conflict
+- NoopAuditSink (D-38): Box<dyn AuditSink + Send> inside Mutex confirmed Sync (PyO3 Pitfall 5+12)
 
 ## Recent Activity
 
@@ -96,6 +99,7 @@ Milestone 3: CLI Operational
 | 2026-05-18 | Phase 4 planned: 5 plans across 3 waves, plan-checker passed after 1 revision iteration (5 BLOCKERS + 3 WARNINGS resolved) |
 | 2026-05-18 | Fixed `~/.claude/settings.json` global bash hooks: `Program Files` path replaced with 8.3 short path `PROGRA~1` to avoid "cannot execute binary file" |
 | 2026-05-18 | Phase 4 Plan 01 executed: NodeKind (Domain/Organization/Nameserver) + EdgeKind (RegisteredBy/HasNameserver) added to kri0k-graph; 13 tests pass, clippy strict green |
+| 2026-05-18 | Phase 4 Plan 02 executed: Error enum expanded to 10 variants (D-53/D-62); 7 workspace deps added; NoopAuditSink renamed (D-38); 13 kri0k-core tests pass, clippy strict green |
 
 ## Blockers
 
