@@ -58,7 +58,7 @@ created: 2026-05-18
 | 04-XX-XX | TBD | TBD | TTP-04 | M-15 | `Engagement::execute_proposal` adiciona ≥1 Domain + ≥1 Organization + N Nameserver nodes | integration | `pytest tests/test_engagement_smoke.py::test_whois_grows_graph -m integration` | ❌ W0 | ⬜ pending |
 | 04-XX-XX | TBD | TBD | TTP-04 | — | Re-execução idempotente (D-43): mesmo target não cria nós duplicados | integration | `pytest tests/test_engagement_smoke.py::test_whois_idempotent -m integration` | ❌ W0 | ⬜ pending |
 | 04-XX-XX | TBD | TBD | TTP-05 | M-34 | Rate limit 1 req/s: 2 chamadas consecutivas levam ≥ 1.0s wall-clock | unit | `cargo test --package kri0k-core ttp::whois::tests::rate_limit_enforced` | ❌ W0 | ⬜ pending |
-| 04-XX-XX | TBD | TBD | D-50 | M-36 | `Engagement::new` retorna `Error::MissingDependency("whois")` quando whois ausente do PATH | unit | `cargo test --package kri0k-core engagement::tests::fails_without_whois` (mock PATH) | ❌ W0 | ⬜ pending |
+| 04-05-04 | 04-05 | 3 | D-50 | M-36 | `which::which("whois")` (caminho subjacente de `Engagement::new`) falha quando PATH vazio (BLOCKER 4 fix — Rust-side integration test em pybridge usa temp-env para isolar PATH) | integration | `cargo test --package kri0k-pybridge --test engagement_missing_whois` | ✅ W0 | ⬜ pending |
 | 04-XX-XX | TBD | TBD | D-51 | — | Timeout 30s mata subprocess; `WhoisTtp::execute` retorna `status: "timeout"` | unit | `cargo test --package kri0k-core ttp::whois::tests::timeout_kills_child` (mock que dorme 60s) | ❌ W0 | ⬜ pending |
 | 04-XX-XX | TBD | TBD | D-62 | M-36 | `Engagement::kill()` cancela execução em andamento via CancellationToken | integration | `pytest tests/test_engagement_smoke.py::test_kill_cancels_execute -m integration` | ❌ W0 | ⬜ pending |
 | 04-XX-XX | TBD | TBD | D-48 | M-02 | Scope violation rejeitada antes do subprocess; outcome `status: "scope_violation"` | unit | `cargo test --package kri0k-core engagement::tests::scope_violation_short_circuits` | ❌ W0 | ⬜ pending |
@@ -127,7 +127,7 @@ Validation tests cover threat mitigations from `docs/security/THREAT_MODEL.md`:
 | M-05 (propose-only default) | `tests/test_act_node.py::test_act_propose_only_skips_rust` | D-49 |
 | M-15 (LLM never executes direct) | Façade pattern + `engagement::tests::scope_violation_short_circuits` | D-34, D-35 |
 | M-34 (TTP rate limit) | `ttp::whois::tests::rate_limit_enforced` | D-45 |
-| M-36 (kill switch) | `engagement::tests::fails_without_whois` + `test_kill_cancels_execute` | D-50, D-62 |
+| M-36 (kill switch) | `cargo test --package kri0k-pybridge --test engagement_missing_whois` + `Engagement.kill()` manual smoke | D-50, D-62 |
 | AB-03 (prompt injection) | `engagement::tests::invalid_target_rejected` | D-63 |
 
 ---

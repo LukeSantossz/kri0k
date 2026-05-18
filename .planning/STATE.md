@@ -3,18 +3,20 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 current_phase: Phase 4 - Act + TTP Whois
-status: context_gathered
+status: ready_to_execute
 last_updated: "2026-05-18T12:00:00.000Z"
 progress:
   total_phases: 12
   completed_phases: 3
-  total_plans: 3
+  total_plans: 8
   completed_plans: 3
-  percent: 100
+  percent: 38
 session:
-  stopped_at: "Phase 4 context gathered (29 decisions D-34..D-64)"
-  resume_file: ".planning/phases/04-act-node-ttp-whois/04-CONTEXT.md"
-  next_command: "/gsd-plan-phase 4"
+  stopped_at: "Phase 4 planned (5 plans across 3 waves, 12+ tasks, decision-coverage gap accepted)"
+  resume_file: ".planning/phases/04-act-node-ttp-whois/04-05-PLAN.md"
+  next_command: "/gsd-execute-phase 4"
+overrides:
+  - decision_coverage_gap_accepted: "Phase 4 — 16 D-XX decisions not literally cited; semantic coverage verified via plan-checker"
 ---
 
 # Project State: kri0k
@@ -23,7 +25,7 @@ session:
 
 **Current Phase:** Phase 4 - Act + TTP Whois
 **Milestone:** 1 of 3 - MVP Execution Loop
-**Status:** Phase 4 context gathered (29 decisions) — ready for `/gsd-plan-phase 4`
+**Status:** Phase 4 planned (5 plans, 3 waves) — ready for `/gsd-execute-phase 4`
 
 ## Project Reference
 
@@ -95,6 +97,9 @@ Milestone 3: CLI Operational
 | 2026-05-16 | Phase 3 executed (reason/plan nodes, parser module, 103 tests) |
 | 2026-05-18 | Meta-state sanitized (TASK-014): AGENTS.md ignored; registry synced with master; Phase 3 retroactive VERIFICATION |
 | 2026-05-18 | Phase 4 context gathered (29 decisions D-34..D-64) — 16 gray areas across 12 categories |
+| 2026-05-18 | Phase 4 research + validation strategy + pattern map produced |
+| 2026-05-18 | Phase 4 planned: 5 plans across 3 waves, plan-checker passed after 1 revision iteration (5 BLOCKERS + 3 WARNINGS resolved) |
+| 2026-05-18 | Fixed `~/.claude/settings.json` global bash hooks: `Program Files` path replaced with 8.3 short path `PROGRA~1` to avoid "cannot execute binary file" |
 
 ## Blockers
 

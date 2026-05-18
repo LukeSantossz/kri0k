@@ -66,7 +66,7 @@ Phase 4 também entrega:
   - Se `True`: act retorna `{status: "proposed", proposal: {...}, would_execute: ttp_id}` sem chamar Rust.
   - Se `False`: act chama `await asyncio.to_thread(engagement.execute_proposal, proposal)`.
   CLI Phase 12 e TUI Phase 11 controlarão a flag.
-- **D-50:** **Whois.exe pré-requisito fail-fast no startup.** `Engagement::new()` chama `which::which("whois")` (crate `which = "6"`). Retorna `Error::MissingDependency("whois")` se ausente. Helper Python propaga a exceção como `RuntimeError` claro. Cobre M-36 indiretamente (sistema não inicia sem dependência crítica).
+- **D-50:** **Whois.exe pré-requisito fail-fast no startup.** `Engagement::new()` chama `which::which("whois")` (crate `which = "8"`, confirmado via crates.io em RESEARCH.md). Retorna `Error::MissingDependency("whois")` se ausente. Helper Python propaga a exceção como `RuntimeError` claro. Cobre M-36 indiretamente (sistema não inicia sem dependência crítica). **Pitfall 7 (GIL):** a chamada `which::which` é I/O bloqueante de filesystem (~1ms) — deve ser executada dentro de `py.allow_threads(|| ...)` no `#[new]` constructor para não bloquear o event loop Python (CONTEXT.md update 2026-05-18 pós-plan-checker).
 - **D-51:** **Timeout subprocess** = 30s default, configurável via novo trait method `Ttp::default_timeout() -> Duration { Duration::from_secs(30) }`. Implementação no `execute()` via `tokio::time::timeout(ttp.default_timeout(), ...)`. Se exceder: kill subprocess (drop do `Child`), retorna `status: "timeout"` no outcome.
 
 ### TTP Registry & Dispatch
