@@ -4,9 +4,9 @@ The sense node observes the current state by fetching a snapshot from
 the Rust core graph and formatting it for downstream LLM consumption.
 It is the first node in each engagement loop iteration.
 
-Phase 2 scope (D-23): sense is **pure** — it reads from `_native` and
-writes the formatted snapshot to `AgentState.snapshot`. It does **not**
-call the LLM; the sense→reason wiring lands in Phase 3.
+Phase 4: prefers ``engagement.snapshot()`` when an Engagement instance is
+present in ``engagement_context``; falls back to the Phase 1/2
+``_native.get_dummy_graph()`` for backward-compat with legacy tests.
 """
 
 from typing import Any
@@ -16,20 +16,26 @@ from kri0k.agent.state import AgentState
 from kri0k.llm.formatters import format_snapshot_hybrid
 
 
-async def sense(state: AgentState) -> dict[str, Any]:  # noqa: ARG001
+async def sense(state: AgentState) -> dict[str, Any]:
     """Sense node: fetch and format the current graph snapshot.
 
+    Phase 4: prefers ``engagement.snapshot()`` when an Engagement is present
+    in context; falls back to ``_native.get_dummy_graph()`` to preserve
+    Phase 1/2 test compatibility.
+
     Args:
-        state: Current agent state (unused — sense is read-only on Rust).
+        state: Current agent state. If ``engagement_context["engagement"]``
+            is present, the snapshot is sourced from it. Otherwise the
+            Rust dummy graph fallback is used.
 
     Returns:
-        State update with the new snapshot. Per D-21 the value is a dict
-        with two keys:
+        State update with the new snapshot. The value is a dict with two keys:
 
-        * ``raw``: the unmodified dict returned by `_native.get_dummy_graph()`.
+        * ``raw``: the unmodified dict from snapshot source.
         * ``formatted``: a string ready to be injected into a prompt
-          (sanitized via M-16 in `format_snapshot_hybrid`).
+          (sanitized via M-16 in ``format_snapshot_hybrid``).
     """
-    raw = _native.get_dummy_graph()
+    engagement = state.get("engagement_context", {}).get("engagement")
+    raw = engagement.snapshot() if engagement is not None else _native.get_dummy_graph()
     formatted = format_snapshot_hybrid(raw)
     return {"snapshot": {"raw": raw, "formatted": formatted}}
