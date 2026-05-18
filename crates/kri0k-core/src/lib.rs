@@ -114,4 +114,43 @@ mod tests {
         let deserialized: NodeId = serde_json::from_str(&json).expect("deserialize");
         assert_eq!(id, deserialized);
     }
+
+    #[test]
+    fn test_error_io_from_conversion() {
+        let io_err = std::io::Error::new(std::io::ErrorKind::NotFound, "test file not found");
+        let e: Error = io_err.into();
+        assert!(matches!(e, Error::Io(_)));
+    }
+
+    #[test]
+    fn test_error_scope_violation_display() {
+        let e = Error::ScopeViolation {
+            target: "evil.com".into(),
+            reason: "not in allowlist".into(),
+        };
+        let msg = e.to_string();
+        assert!(msg.contains("evil.com"), "expected 'evil.com' in: {msg}");
+    }
+
+    #[test]
+    fn test_error_missing_dependency_display() {
+        let e = Error::MissingDependency {
+            binary: "whois".into(),
+        };
+        let msg = e.to_string();
+        assert!(msg.contains("whois"), "expected 'whois' in: {msg}");
+        assert!(msg.contains("PATH"), "expected 'PATH' in: {msg}");
+    }
+
+    #[test]
+    fn test_error_cancelled_display() {
+        assert_eq!(Error::Cancelled.to_string(), "operation cancelled");
+    }
+
+    #[test]
+    fn test_error_json_still_works() {
+        let parse_err = serde_json::from_str::<i32>("not json").unwrap_err();
+        let e: Error = Error::from(parse_err);
+        assert!(matches!(e, Error::Json(_)));
+    }
 }
