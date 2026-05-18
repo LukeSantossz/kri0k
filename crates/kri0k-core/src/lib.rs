@@ -23,6 +23,68 @@ pub enum Error {
     /// Generic error with context.
     #[error("{0}")]
     Generic(String),
+
+    /// I/O error from the operating system.
+    #[error("I/O error: {0}")]
+    Io(#[from] std::io::Error),
+
+    /// Scope violation: target not in scope allowlist (M-02).
+    #[error("scope violation for target {target:?}: {reason}")]
+    ScopeViolation {
+        /// Target that was rejected.
+        target: String,
+        /// Reason for rejection.
+        reason: String,
+    },
+
+    /// Rate limit exceeded for a TTP (M-34).
+    #[error("rate limit exceeded for TTP {ttp_id}: retry in {retry_in_ms}ms")]
+    RateLimitExceeded {
+        /// TTP identifier that hit the limit.
+        ttp_id: String,
+        /// Milliseconds to wait before retrying.
+        retry_in_ms: u64,
+    },
+
+    /// Subprocess timeout for a TTP (M-34, D-51).
+    #[error("TTP {ttp_id} subprocess timeout after {timeout_ms}ms")]
+    SubprocessTimeout {
+        /// TTP identifier that timed out.
+        ttp_id: String,
+        /// Timeout threshold in milliseconds.
+        timeout_ms: u64,
+    },
+
+    /// Parse error in a structured input (scope.yaml, whois output).
+    #[error("parse error in {origin}: {detail}")]
+    ParseError {
+        /// Source identifier (e.g. "scope.yaml", "whois stdout").
+        origin: String,
+        /// Human-readable detail about the parse failure.
+        detail: String,
+    },
+
+    /// Missing external binary dependency (D-50).
+    #[error(
+        "missing dependency: binary {binary:?} not found in PATH. \
+        Install with: winget install Microsoft.Sysinternals.Whois (Windows) \
+        or apt install whois (Linux)"
+    )]
+    MissingDependency {
+        /// Name of the binary that was not found.
+        binary: String,
+    },
+
+    /// Unknown TTP identifier requested (D-52).
+    #[error("unknown TTP id: {ttp_id:?}")]
+    UnknownTtp {
+        /// The unrecognized TTP identifier.
+        ttp_id: String,
+    },
+
+    /// Operation was cancelled via kill switch (D-62, M-36).
+    #[error("operation cancelled")]
+    Cancelled,
 }
 
 /// Result type alias.
@@ -149,7 +211,8 @@ mod tests {
 
     #[test]
     fn test_error_json_still_works() {
-        let parse_err = serde_json::from_str::<i32>("not json").unwrap_err();
+        let parse_err = serde_json::from_str::<i32>("not json")
+            .expect_err("parsing 'not json' as i32 should fail");
         let e: Error = Error::from(parse_err);
         assert!(matches!(e, Error::Json(_)));
     }

@@ -80,13 +80,13 @@ pub struct EngagementEvent {
     pub operator: String,
 }
 
-/// No-op audit sink for testing.
+/// No-op audit sink for testing and default engagement bootstrap (D-38).
 ///
 /// TODO(T7/M-13): Replace with real append-only implementation.
 #[derive(Debug, Default)]
-pub struct NoOpAuditSink;
+pub struct NoopAuditSink;
 
-impl AuditSink for NoOpAuditSink {
+impl AuditSink for NoopAuditSink {
     fn log_ttp_execution(&mut self, _event: TtpExecutionEvent) -> Result<(), crate::Error> {
         // TODO(T7/M-13): Implement real audit logging
         Ok(())
@@ -115,5 +115,35 @@ pub fn create_audit_sink(_path: &Path) -> Result<Box<dyn AuditSink>, crate::Erro
     // TODO(T7/M-13): Implement append-only JSONL audit sink
     // TODO(T7/M-14): Implement regex-based credential redactor
     // TODO(T7/M-22): Implement hash-chained log verification
-    Ok(Box::new(NoOpAuditSink))
+    Ok(Box::new(NoopAuditSink))
+}
+
+#[cfg(test)]
+#[allow(clippy::expect_used)] // expect is ok in tests
+mod tests {
+    use super::*;
+
+    fn assert_sync<T: Sync>() {}
+
+    #[test]
+    fn test_noop_audit_sink_is_boxable() {
+        let mut sink: Box<dyn AuditSink> = Box::new(NoopAuditSink);
+        let result = sink.log_ttp_execution(TtpExecutionEvent {
+            timestamp: "2026-01-01T00:00:00Z".into(),
+            ttp_id: "test".into(),
+            target: "x".into(),
+            outcome: "ok".into(),
+            llm_provider: None,
+        });
+        assert!(result.is_ok());
+    }
+
+    #[test]
+    fn test_noop_audit_sink_is_mutex_boxable_sync() {
+        // Confirms Pitfall 5 + Pitfall 12 invariant: Box<dyn AuditSink + Send> inside Mutex is Sync.
+        // Plano 04-05 Engagement::audit uses exactly this shape — failure here = breaks the pyclass.
+        let _: std::sync::Mutex<Box<dyn AuditSink + Send>> =
+            std::sync::Mutex::new(Box::new(NoopAuditSink));
+        assert_sync::<std::sync::Mutex<Box<dyn AuditSink + Send>>>();
+    }
 }
