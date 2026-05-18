@@ -81,10 +81,10 @@ pub enum RiskLevel {
 #[async_trait]
 pub trait Ttp: Send + Sync {
     /// MITRE ATT&CK TTP identifier (e.g., "T1590.001").
-    fn id(&self) -> &str;
+    fn id(&self) -> &'static str;
 
     /// Short description of what this TTP does.
-    fn description(&self) -> &str;
+    fn description(&self) -> &'static str;
 
     /// Risk level classification for gate decisions (M-21).
     fn risk_level(&self) -> RiskLevel {

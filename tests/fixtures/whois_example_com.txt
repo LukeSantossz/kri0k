@@ -1,6 +1,6 @@
-Uma tentativa de conex„o falhou porque o componente conectado n„o respondeu
-corretamente apÛs um perÌodo de tempo ou a conex„o estabelecida falhou
-porque o host conectado n„o respondeu.
+Uma tentativa de conex√£o falhou porque o componente conectado n√£o respondeu
+corretamente ap√≥s um per√≠odo de tempo ou a conex√£o estabelecida falhou
+porque o host conectado n√£o respondeu.
 Connecting to COM.whois-servers.net...
 Server COM.whois-servers.net returned the following for EXAMPLE.COM
 
