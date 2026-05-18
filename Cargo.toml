@@ -20,6 +20,12 @@ tokio = { version = "1.40", features = ["rt", "rt-multi-thread", "macros"] }
 pyo3 = { version = "0.24", features = ["extension-module"] }
 petgraph = { version = "0.6", features = ["serde-1"] }
 ulid = { version = "1.1", features = ["serde"] }
+tokio-util = { version = "0.7", features = ["rt"] }
+which = "8"
+async-trait = "0.1"
+tracing = "0.1"
+serde_yaml_ng = "0.10"
+regex = "1"
 
 [workspace.lints.rust]
 unsafe_code = "warn"
