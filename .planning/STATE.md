@@ -35,7 +35,7 @@ Milestone 1: MVP Execution Loop
   Phase 1: LangGraph Structure    ● Complete (1/1 plans)
   Phase 2: Sense + Ollama         ● Complete (1/1 plans)
   Phase 3: Reason + Plan          ● Complete (1/1 plans)
-  Phase 4: Act + TTP Whois        ◑ In Progress (3/5 plans)
+  Phase 4: Act + TTP Whois        ◑ In Progress (4/5 plans)
   Phase 5: Reflect                ○ Pending
   Phase 6: Loop Integration       ○ Pending
 
@@ -70,6 +70,7 @@ Milestone 3: CLI Operational
 | 04 | 01 | ~5 min | 2 | 1 |
 | 04 | 02 | ~10 min | 2 | 4 |
 | 04 | 03 | ~35 min | 2 | 9 |
+| 04 | 04 | ~10 min | 2 | 2 |
 
 ## Decisions
 
@@ -83,6 +84,9 @@ Milestone 3: CLI Operational
 - Ttp trait uses &'static str for id/description (clippy unnecessary_literal_bound)
 - MockSubprocess::hanging uses tokio::select! biased internally (cancel > timeout > pending)
 - Whois fixtures captured live; example.com converted from ISO-8859-1 to UTF-8 (Windows locale)
+- ScopeConfig::default() for SafeguardsSection is manual impl (propose_only=true, Pitfall 11 mitigated)
+- ScopeConfig::from_dict_value serializes JSON to YAML via serde_yaml_ng for M-03 hash consistency
+- validate_target uses iter().any(|t| t == target) — never contains/starts_with (D-48, T-04-04-04)
 
 ## Recent Activity
 
@@ -105,6 +109,7 @@ Milestone 3: CLI Operational
 | 2026-05-18 | Phase 4 Plan 01 executed: NodeKind (Domain/Organization/Nameserver) + EdgeKind (RegisteredBy/HasNameserver) added to kri0k-graph; 13 tests pass, clippy strict green |
 | 2026-05-18 | Phase 4 Plan 02 executed: Error enum expanded to 10 variants (D-53/D-62); 7 workspace deps added; NoopAuditSink renamed (D-38); 13 kri0k-core tests pass, clippy strict green |
 | 2026-05-18 | Phase 4 Plan 03 executed: async Ttp trait + Subprocess abstraction + WhoisTtp (T1590.001) + heuristic parser + 3 fixtures; 26 tests pass (unit + integration), clippy strict green |
+| 2026-05-18 | Phase 4 Plan 04 executed: ScopeConfig v1 schema parser (from_yaml + from_dict_value + validate_target + compute_hash); SafeguardsSection manual Default (Pitfall 11); 13 tests pass, clippy strict green |
 
 ## Blockers
 

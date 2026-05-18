@@ -105,7 +105,7 @@ Plans:
 
 **Wave 2** *(blocked on Wave 1 completion)*
 - [x] 04-03-PLAN.md - TTP module promotion to async + Subprocess abstraction + WhoisTtp + parser + fixtures (Wave 2)
-- [ ] 04-04-PLAN.md - ScopeConfig parser (lookahead v1 schema) + allowlist exact-match + SHA-256 hash + scope.example.yaml (Wave 2)
+- [x] 04-04-PLAN.md - ScopeConfig parser (lookahead v1 schema) + allowlist exact-match + SHA-256 hash + scope.example.yaml (Wave 2)
 
 **Wave 3** *(blocked on Wave 2 completion)*
 - [ ] 04-05-PLAN.md - Engagement pyclass + Python wiring (engagement.py, act.py, sense.py) + tests + docs (Wave 3)
