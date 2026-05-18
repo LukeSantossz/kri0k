@@ -108,6 +108,12 @@ Lint pass: `style(llm): satisfy ruff strict and mypy strict on phase-2 surface`.
 - **Commit:** `51a1ec8` `test(ci): add pytest markers for CI test execution`
 - **Resultado:** aprovado — 51 unit, 7 integration, 12 graph
 
+### TASK-014 | patch (concluída 2026-05-18)
+- **Objetivo:** Ignorar `AGENTS.md` (espelho local do CLAUDE.md, gerado por tooling externo) no controle de versão.
+- **Arquivos:** `.gitignore`
+- **Resultado:** aprovado — `git status` confirma que `AGENTS.md` deixou de aparecer como untracked.
+- **Acompanhamento (meta-framework, fora da trava):** sincronizado `.claude/registry.md` com Phase 3 + branch `master`, gerado `.planning/phases/03-reason-plan-nodes/03-VERIFICATION.md` retroativo a partir de git + código.
+
 ## Tasks Descartadas
 
 [nenhuma task descartada]
