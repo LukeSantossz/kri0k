@@ -19,13 +19,14 @@
 | 02 | 2026-05-15 | TASK-013 | patch | `tests/test_*.py` (10 arquivos) | aprovado | Adicionados pytest markers (`unit`, `integration`, `graph`) para CI. 51 unit, 7 integration, 12 graph. |
 | 03 | 2026-05-16 | Phase 3 (não decomposta em TASK-NNN) | major (agregada) | `python/kri0k/llm/parser.py` (novo), `python/kri0k/llm/prompts/{reason,plan}.jinja2` (2 templates), `python/kri0k/agent/nodes/{reason,plan}.py` (wiring LLM), `python/kri0k/llm/__init__.py` (exports), `tests/test_llm_parser.py`, `tests/test_reason_node.py` (4), `tests/test_plan_node.py` (5) | aprovado | Reason + Plan nodes integrados ao LLM. `<think>` tag stripping resolvido (D-33). 33 testes novos → 103 totais. Commits: `a202c35`, `3ea70d1`, `4659683`, `0be9f0c`. Merged em master via PR #2 junto da Phase 2. **Lacuna documental:** artefatos GSD `03-CONTEXT.md`/`03-DISCUSSION-LOG.md`/`03-PLAN.md` não foram persistidos; apenas `03-VERIFICATION.md` retroativo gerado em 2026-05-18. |
 | 04 | 2026-05-18 | TASK-014 | patch | `.gitignore` (+`AGENTS.md`), `.claude/tasks.md`, `.claude/registry.md`, `.planning/phases/03-reason-plan-nodes/03-VERIFICATION.md` (novo retroativo) | aprovado | Sanitização de meta-estado pré-Phase 4. Ignora `AGENTS.md` (espelho local do CLAUDE.md). Registry reconciliado com `master` pós-merge PR #2. VERIFICATION da Phase 3 reconstruído a partir de git+código. |
+| 06 | 2026-05-19 | TASK-016 | patch | `crates/kri0k-core/src/{scope.rs,ttp/subprocess.rs,ttp/whois.rs}`, `crates/kri0k-graph/src/lib.rs`, `crates/kri0k-pybridge/src/lib.rs`, `python/kri0k/_native.pyi`, `python/kri0k/agent/nodes/act.py`, `tests/test_act_node.py` | aprovado | Fix CI PR #3: `cargo fmt` + `ruff format`, 100% formatação. Commit `db9e070`. Causa raiz: TASK-015 não rodou os formatters (só clippy/test/lint/mypy/pytest). 4 jobs do CI falhavam só no format check. |
 | 05 | 2026-05-18 | TASK-015 | major | Plan 04-05 completo: `crates/kri0k-pybridge/{Cargo.toml,src/lib.rs,tests/engagement_missing_whois.rs}` (Engagement pyclass + 10 Rust tests), `python/kri0k/{_native.pyi,engagement.py,agent/nodes/{act,sense}.py}` (Python wiring), `tests/{test_act_node,test_engagement_smoke}.py` (16 Python tests), `README.md`+`CONTRIBUTING.md`+`CHANGELOG.md`+`docs/adr/ADR-0013-*.md` (docs pack), `.planning/phases/04-act-node-ttp-whois/{04-05-SUMMARY.md,04-VALIDATION.md}`+`.planning/{STATE,ROADMAP}.md` (meta-state) | aprovado | Phase 4 completa (5/5 plans). 5 commits atômicos (`8fc8877`, `c281f77`, `81e5e05`, `7e7bd96`, `0b35479`, `5949170`). Validações: cargo test workspace 65/65 ✅, clippy strict zero issues, ruff+mypy strict zero issues, pytest unit 104 pass, pytest integration 8/8 pass com whois real (67s). D-63 defense-in-depth L1+L2+L3 covered. AGENT-05 + TTP-04 cumpridos. Alinhamento 100% com 04-05-PLAN.md acordado upfront (helpers renomeados, dedupe unificado, regex const module-level, audit timestamp real). |
 
 ## Estado da Codebase
 
-- **Última atualização:** 2026-05-18
+- **Última atualização:** 2026-05-19
 - **Último responsável:** kri0k-agent (Claude Opus 4.7)
-- **Branch ativa:** `feat/phase-4-act-ttp-whois` (Phase 4 completa, 6 commits ahead de master, aguardando `/gsd-verify-work 4` + PR per D-59)
+- **Branch ativa:** `feat/phase-4-act-ttp-whois` (Phase 4 completa + fix de formatação CI, 7 commits ahead de master, PR #3 aberto)
 - **Dependências alteradas recentemente:** Phase 4 add `tokio-util`/`which`/`regex`/`tracing` workspace deps consumidos em pybridge; dev-dep `temp-env = "0.3"` em pybridge
 - **Testes passando:** sim — `cargo test --workspace` 65/65 (36 core + 13 graph + 8 pybridge lib + 2 pybridge integration + outras); `pytest -m "not integration"` 104 pass / 15 deselected; `pytest -m integration` 8/8 pass com whois real em 67s
 - **Lint/types:** ✅ cargo clippy --workspace strict clean; ruff all checks passed em python/+tests/; mypy strict zero issues
@@ -38,6 +39,7 @@
 - **`requirements.md` declara Windows como Out of Scope** mas o desenvolvimento está acontecendo em Windows 11 e Phase 4 foi entregue com `whois.exe` Sysinternals. Aceita divergência documentada (CHANGELOG 0.2.0 e README cobrem o caso Windows + Linux).
 - **Phase 3 sem artefatos GSD upstream:** apenas `03-VERIFICATION.md` retroativo existe. Decisões originais da Phase 3 perdidas — recuperáveis parcialmente via `git log` e prompts em `python/kri0k/llm/prompts/`.
 - **Hooks Git ainda não instalados** (`git config core.hooksPath` não definido). Próximas sessões podem rodar `bash .claude/setup-hooks.sh` para ativar enforcement local.
+- **Gate de formatação local ausente (TASK-016):** o fluxo de validação não inclui `cargo fmt --all -- --check` nem `ruff format --check`, por isso a formatação derivou e só o CI pegou (PR #3). Corrigir: adicionar ambos ao checklist pré-commit e/ou aos hooks git.
 - Verificação live de sucesso do `ping_ollama` (Phase 2) requer Ollama rodando + `deepseek-r1:32b` puxado. Documentado em `02-VERIFICATION.md` §4.
 
 ## Decisões Técnicas Relevantes

@@ -71,11 +71,19 @@
 
 > A primeira task listada é a ativa. O agente trabalha nela até conclusão, descarte ou bloqueio.
 
-_(nenhuma task ativa — última conclusão: TASK-015 em 2026-05-18)_
+_(nenhuma task ativa — última conclusão: TASK-016 em 2026-05-19)_
 
 ## Tasks Concluídas
 
 > Movidas para cá após conclusão e atualização do `registry.md`. Nunca remova entradas.
+
+### TASK-016 | patch (concluída 2026-05-19) — Fix CI: rustfmt + ruff format
+- **Objetivo:** Corrigir falha de CI no PR #3 aplicando `cargo fmt` + `ruff format` (8 arquivos), sem mudança de lógica.
+- **Arquivos:** `crates/kri0k-core/src/{scope.rs,ttp/subprocess.rs,ttp/whois.rs}`, `crates/kri0k-graph/src/lib.rs`, `crates/kri0k-pybridge/src/lib.rs`, `python/kri0k/_native.pyi`, `python/kri0k/agent/nodes/act.py`, `tests/test_act_node.py`
+- **Commit:** `db9e070` `style(format): apply rustfmt and ruff format for CI`
+- **Causa raiz:** validação da TASK-015 cobriu clippy/test/`ruff check`/mypy/pytest mas não `cargo fmt --check` nem `ruff format --check`. Os jobs Rust (stable/win, beta/ubuntu, stable/macos) e Python (3.11/win, 3.12/ubuntu) do CI falharam só nos passos de format check.
+- **Resultado:** aprovado — `cargo fmt --all -- --check` exit 0, `ruff format --check` "36 files already formatted", `cargo check --workspace --exclude kri0k-pybridge` ok. Diff revisado: 100% formatação (import sort, colapso de `format!`, `match_block_trailing_comma`, quebra de linha).
+- **Débito:** instalar hooks git (`core.hooksPath`) e/ou adicionar `cargo fmt --check`+`ruff format --check` ao gate local pré-commit para evitar recorrência.
 
 ### TASK-015 | major (concluída 2026-05-18) — Phase 4: Act Node + TTP Whois
 
