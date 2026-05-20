@@ -2,35 +2,31 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-current_phase: Phase 4 - Act + TTP Whois
-status: context_gathered
-last_updated: "2026-05-18T12:00:00.000Z"
+current_phase: 4
+status: executing
+last_updated: "2026-05-18T00:00:00.000Z"
 progress:
   total_phases: 12
   completed_phases: 3
-  total_plans: 3
-  completed_plans: 3
-  percent: 100
-session:
-  stopped_at: "Phase 4 context gathered (29 decisions D-34..D-64)"
-  resume_file: ".planning/phases/04-act-node-ttp-whois/04-CONTEXT.md"
-  next_command: "/gsd-plan-phase 4"
+  total_plans: 6
+  completed_plans: 6
+  percent: 29
 ---
 
 # Project State: kri0k
 
 ## Status
 
-**Current Phase:** Phase 4 - Act + TTP Whois
+**Current Phase:** 4
 **Milestone:** 1 of 3 - MVP Execution Loop
-**Status:** Phase 4 context gathered (29 decisions) — ready for `/gsd-plan-phase 4`
+**Status:** Phase 4 Complete (awaiting verify + PR)
 
 ## Project Reference
 
 See: `.planning/PROJECT.md` (updated 2026-05-14)
 
 **Core value:** Execução segura e auditável de técnicas ofensivas
-**Current focus:** MVP Execution Loop
+**Current focus:** Phase 4 — Act Node + TTP Whois
 
 ## Progress
 
@@ -39,8 +35,7 @@ Milestone 1: MVP Execution Loop
   Phase 1: LangGraph Structure    ● Complete (1/1 plans)
   Phase 2: Sense + Ollama         ● Complete (1/1 plans)
   Phase 3: Reason + Plan          ● Complete (1/1 plans)
-  Phase 4: Act + TTP Whois        ○ Pending
-  Phase 4: Act + TTP Whois        ○ Pending
+  Phase 4: Act + TTP Whois        ● Complete (5/5 plans)
   Phase 5: Reflect                ○ Pending
   Phase 6: Loop Integration       ○ Pending
 
@@ -60,10 +55,10 @@ Milestone 3: CLI Operational
 | Metric | Value |
 |--------|-------|
 | Phases total | 12 |
-| Phases complete | 3 |
+| Phases complete | 4 |
 | Requirements total | 42 |
-| Requirements complete | 8 |
-| Commits this milestone | 16 |
+| Requirements complete | 10 |
+| Commits this milestone | 21 |
 
 ## Performance Metrics
 
@@ -72,6 +67,11 @@ Milestone 3: CLI Operational
 | 01 | 01 | ~8 min | 3 | 10 |
 | 02 | 01 | ~15 min | 8 | 12 |
 | 03 | 01 | ~10 min | 6 | 11 |
+| 04 | 01 | ~5 min | 2 | 1 |
+| 04 | 02 | ~10 min | 2 | 4 |
+| 04 | 03 | ~35 min | 2 | 9 |
+| 04 | 04 | ~10 min | 2 | 2 |
+| 04 | 05 | ~2h | 5 | 14 |
 
 ## Decisions
 
@@ -79,6 +79,15 @@ Milestone 3: CLI Operational
 - All nodes are async functions for future LLM/Rust integration
 - MAX_ITERATIONS=10 hardcoded for iteration control
 - Router uses named function (not lambda) per D-10
+- NodeKind/EdgeKind enums extended with whois domain types (D-39/D-40); serde snake_case tagged
+- ParseError field renamed 'source' -> 'origin' to avoid thiserror field-named-source conflict
+- NoopAuditSink (D-38): Box<dyn AuditSink + Send> inside Mutex confirmed Sync (PyO3 Pitfall 5+12)
+- Ttp trait uses &'static str for id/description (clippy unnecessary_literal_bound)
+- MockSubprocess::hanging uses tokio::select! biased internally (cancel > timeout > pending)
+- Whois fixtures captured live; example.com converted from ISO-8859-1 to UTF-8 (Windows locale)
+- ScopeConfig::default() for SafeguardsSection is manual impl (propose_only=true, Pitfall 11 mitigated)
+- ScopeConfig::from_dict_value serializes JSON to YAML via serde_yaml_ng for M-03 hash consistency
+- validate_target uses iter().any(|t| t == target) — never contains/starts_with (D-48, T-04-04-04)
 
 ## Recent Activity
 
@@ -95,6 +104,14 @@ Milestone 3: CLI Operational
 | 2026-05-16 | Phase 3 executed (reason/plan nodes, parser module, 103 tests) |
 | 2026-05-18 | Meta-state sanitized (TASK-014): AGENTS.md ignored; registry synced with master; Phase 3 retroactive VERIFICATION |
 | 2026-05-18 | Phase 4 context gathered (29 decisions D-34..D-64) — 16 gray areas across 12 categories |
+| 2026-05-18 | Phase 4 research + validation strategy + pattern map produced |
+| 2026-05-18 | Phase 4 planned: 5 plans across 3 waves, plan-checker passed after 1 revision iteration (5 BLOCKERS + 3 WARNINGS resolved) |
+| 2026-05-18 | Fixed `~/.claude/settings.json` global bash hooks: `Program Files` path replaced with 8.3 short path `PROGRA~1` to avoid "cannot execute binary file" |
+| 2026-05-18 | Phase 4 Plan 01 executed: NodeKind (Domain/Organization/Nameserver) + EdgeKind (RegisteredBy/HasNameserver) added to kri0k-graph; 13 tests pass, clippy strict green |
+| 2026-05-18 | Phase 4 Plan 02 executed: Error enum expanded to 10 variants (D-53/D-62); 7 workspace deps added; NoopAuditSink renamed (D-38); 13 kri0k-core tests pass, clippy strict green |
+| 2026-05-18 | Phase 4 Plan 03 executed: async Ttp trait + Subprocess abstraction + WhoisTtp (T1590.001) + heuristic parser + 3 fixtures; 26 tests pass (unit + integration), clippy strict green |
+| 2026-05-18 | Phase 4 Plan 04 executed: ScopeConfig v1 schema parser (from_yaml + from_dict_value + validate_target + compute_hash); SafeguardsSection manual Default (Pitfall 11); 13 tests pass, clippy strict green |
+| 2026-05-18 | Phase 4 Plan 05 executed: Engagement pyclass (5 methods) + engagement.create() + act/sense wiring + docs pack; 10 new Rust tests + 16 new Python tests; 8/8 integration smoke pass with real whois; AGENT-05 + TTP-04 complete; D-63 L1+L2+L3 defense-in-depth covered |
 
 ## Blockers
 

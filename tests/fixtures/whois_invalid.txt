@@ -1,0 +1,4 @@
+ERROR
+garbage data with no colon
+: empty key
+key without value:

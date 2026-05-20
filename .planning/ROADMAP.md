@@ -96,6 +96,20 @@ Plans:
 
 **Requirements:** AGENT-05, TTP-01, TTP-02, TTP-03, TTP-04, TTP-05
 
+**Plans:** 5 plans (3 waves)
+
+Plans:
+**Wave 1**
+- [x] 04-01-PLAN.md - Graph data model: NodeKind Domain/Organization/Nameserver + EdgeKind RegisteredBy/HasNameserver (Wave 1)
+- [x] 04-02-PLAN.md - Error taxonomy + Cargo deps (tokio-util, which, async-trait, tracing, serde_yaml_ng) + NoopAuditSink rename (Wave 1)
+
+**Wave 2** *(blocked on Wave 1 completion)*
+- [x] 04-03-PLAN.md - TTP module promotion to async + Subprocess abstraction + WhoisTtp + parser + fixtures (Wave 2)
+- [x] 04-04-PLAN.md - ScopeConfig parser (lookahead v1 schema) + allowlist exact-match + SHA-256 hash + scope.example.yaml (Wave 2)
+
+**Wave 3** *(blocked on Wave 2 completion)*
+- [x] 04-05-PLAN.md - Engagement pyclass + Python wiring (engagement.py, act.py, sense.py) + tests + docs (Wave 3)
+
 **Success Criteria:**
 1. TTP whois implementa trait `Ttp` em `crates/kri0k-core/src/ttp/whois.rs`
 2. `whois example.com` retorna struct com registrant, nameservers, dates

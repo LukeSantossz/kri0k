@@ -18,3 +18,11 @@ kri0k-graph = { path = "../kri0k-graph" }
 pyo3.workspace = true
 tokio.workspace = true
 serde_json.workspace = true
+serde.workspace = true
+tokio-util.workspace = true
+which.workspace = true
+regex.workspace = true
+tracing.workspace = true
+
+[dev-dependencies]
+temp-env = "0.3"

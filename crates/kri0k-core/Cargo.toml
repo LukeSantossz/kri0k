@@ -11,5 +11,20 @@ workspace = true
 [dependencies]
 serde.workspace = true
 serde_json.workspace = true
+serde_yaml_ng.workspace = true
 thiserror.workspace = true
 ulid.workspace = true
+tokio = { workspace = true, features = ["process", "time", "sync", "macros"] }
+tokio-util.workspace = true
+which.workspace = true
+async-trait.workspace = true
+tracing.workspace = true
+sha2 = "0.10"
+
+[features]
+default = []
+integration = []
+
+[dev-dependencies]
+tokio = { workspace = true, features = ["macros", "rt-multi-thread"] }
+tracing-subscriber = "0.3"

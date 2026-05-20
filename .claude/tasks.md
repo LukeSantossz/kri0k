@@ -71,11 +71,33 @@
 
 > A primeira task listada é a ativa. O agente trabalha nela até conclusão, descarte ou bloqueio.
 
-[nenhuma task ativa]
+_(nenhuma task ativa — última conclusão: TASK-016 em 2026-05-19)_
 
 ## Tasks Concluídas
 
 > Movidas para cá após conclusão e atualização do `registry.md`. Nunca remova entradas.
+
+### TASK-016 | patch (concluída 2026-05-19) — Fix CI: rustfmt + ruff format
+- **Objetivo:** Corrigir falha de CI no PR #3 aplicando `cargo fmt` + `ruff format` (8 arquivos), sem mudança de lógica.
+- **Arquivos:** `crates/kri0k-core/src/{scope.rs,ttp/subprocess.rs,ttp/whois.rs}`, `crates/kri0k-graph/src/lib.rs`, `crates/kri0k-pybridge/src/lib.rs`, `python/kri0k/_native.pyi`, `python/kri0k/agent/nodes/act.py`, `tests/test_act_node.py`
+- **Commit:** `db9e070` `style(format): apply rustfmt and ruff format for CI`
+- **Causa raiz:** validação da TASK-015 cobriu clippy/test/`ruff check`/mypy/pytest mas não `cargo fmt --check` nem `ruff format --check`. Os jobs Rust (stable/win, beta/ubuntu, stable/macos) e Python (3.11/win, 3.12/ubuntu) do CI falharam só nos passos de format check.
+- **Resultado:** aprovado — `cargo fmt --all -- --check` exit 0, `ruff format --check` "36 files already formatted", `cargo check --workspace --exclude kri0k-pybridge` ok. Diff revisado: 100% formatação (import sort, colapso de `format!`, `match_block_trailing_comma`, quebra de linha).
+- **Débito:** instalar hooks git (`core.hooksPath`) e/ou adicionar `cargo fmt --check`+`ruff format --check` ao gate local pré-commit para evitar recorrência.
+
+### TASK-015 | major (concluída 2026-05-18) — Phase 4: Act Node + TTP Whois
+
+- **Objetivo:** Implementar Phase 4 (T1590.001 whois) e expor `Engagement` pyclass como container canônico de estado, fechando o loop sense→reason→plan→act→reflect.
+- **Branch:** `feat/phase-4-act-ttp-whois` (6 commits ahead de master, aguardando PR per D-59)
+- **Plans GSD executados (5/5):** 04-01 NodeKind/EdgeKind · 04-02 Error+deps · 04-03 WhoisTtp+Subprocess · 04-04 ScopeConfig · 04-05 Engagement+wiring+docs
+- **Commits do plan 04-05:** `8fc8877` (Task 1 pyclass) · `c281f77` (Task 2 stubs+bootstrap) · `81e5e05` (Task 3 act/sense) · `7e7bd96` (Task 4 tests) · `0b35479` (Task 5 docs) · `5949170` (meta-state wrap-up)
+- **Avaliação pós-implementação:** aprovado — cargo test workspace 65/65 ✅, clippy strict zero issues, ruff+mypy strict zero issues, pytest unit 104 pass, pytest integration 8/8 pass com whois real (67s)
+- **Requisitos completados:** AGENT-05, TTP-04. D-63 defense-in-depth L1+L2+L3 covered. M-02/M-03/M-05/M-15/M-34/M-36/AB-03 todos covered.
+- **Lições:**
+  1. Trabalho draft pré-existente em `lib.rs` foi refatorado 100% para o plano em vez de adaptar — escolha do usuário que evitou divergência documentada futura.
+  2. Plan typo `Error::ParseError { source }` corrigido em runtime para `origin` (campo real do `thiserror` enum).
+  3. `maturin develop` é mandatório após mudanças em cdylib antes de qualquer pytest que importe `_native` (smoke tests inicialmente falhavam por `.pyd` antigo sem a class `Engagement`).
+- **Próximo passo (fora desta task):** `/gsd-verify-work 4` + PR `feat/phase-4-act-ttp-whois → master` per D-59.
 
 ### Phase 2 — Sense Node + Ollama Provider (concluída 2026-05-15)
 
