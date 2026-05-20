@@ -2,14 +2,10 @@
 #![allow(clippy::useless_conversion)] // PyResult type annotations trigger false positives
 
 use kri0k_core::{
-    Error, NodeId,
     audit::{AuditSink, NoopAuditSink, TtpExecutionEvent},
     scope::ScopeConfig,
-    ttp::{
-        Ttp, TtpOutput,
-        subprocess::RealSubprocess,
-        whois::WhoisTtp,
-    },
+    ttp::{subprocess::RealSubprocess, whois::WhoisTtp, Ttp, TtpOutput},
+    Error, NodeId,
 };
 use kri0k_graph::{Edge, EdgeKind, Graph, Node, NodeKind};
 use pyo3::exceptions::PyRuntimeError;
@@ -81,7 +77,10 @@ fn error_to_outcome(e: &Error) -> JsonValue {
             "scope_violation",
             format!("scope violation for {target:?}: {reason}"),
         ),
-        Error::RateLimitExceeded { ttp_id, retry_in_ms } => (
+        Error::RateLimitExceeded {
+            ttp_id,
+            retry_in_ms,
+        } => (
             "rate_limited",
             format!("rate limit exceeded for {ttp_id}: retry in {retry_in_ms}ms"),
         ),
@@ -92,7 +91,7 @@ fn error_to_outcome(e: &Error) -> JsonValue {
         Error::UnknownTtp { ttp_id } => ("error", format!("unknown TTP id: {ttp_id}")),
         Error::ParseError { origin, detail } => {
             ("error", format!("parse_error in {origin}: {detail}"))
-        }
+        },
         Error::Cancelled => ("error", "operation cancelled".to_string()),
         other => ("error", other.to_string()),
     };
@@ -106,11 +105,7 @@ fn error_to_outcome(e: &Error) -> JsonValue {
 }
 
 /// Build the `executed` outcome JSON value per D-47.
-fn build_executed_outcome(
-    result: &TtpOutput,
-    nodes_added: usize,
-    edges_added: usize,
-) -> JsonValue {
+fn build_executed_outcome(result: &TtpOutput, nodes_added: usize, edges_added: usize) -> JsonValue {
     let result_json = match result {
         TtpOutput::Whois(w) => serde_json::to_value(w).unwrap_or(JsonValue::Null),
     };
@@ -281,10 +276,7 @@ impl Engagement {
                 // 3. D-52: build registry HashMap (hardcoded T1590.001 for Phase 4).
                 let subprocess = Arc::new(RealSubprocess);
                 let mut registry: HashMap<String, Box<dyn Ttp>> = HashMap::new();
-                registry.insert(
-                    "T1590.001".to_string(),
-                    Box::new(WhoisTtp::new(subprocess)),
-                );
+                registry.insert("T1590.001".to_string(), Box::new(WhoisTtp::new(subprocess)));
 
                 Ok(EngagementInner {
                     graph: Mutex::new(Graph::new()),
@@ -355,9 +347,7 @@ impl Engagement {
                 if !re.is_match(&target) {
                     return Err(Error::ParseError {
                         origin: "proposal.target".to_string(),
-                        detail: format!(
-                            "target {target:?} is not a valid domain (D-63 Layer 2)"
-                        ),
+                        detail: format!("target {target:?} is not a valid domain (D-63 Layer 2)"),
                     });
                 }
 
@@ -544,9 +534,7 @@ mod tests {
             ..Default::default()
         });
         let _ = e.apply_whois_output("acme.com", &output).expect("first");
-        let (nodes, edges) = e
-            .apply_whois_output("acme.com", &output)
-            .expect("second");
+        let (nodes, edges) = e.apply_whois_output("acme.com", &output).expect("second");
         assert_eq!(nodes, 0, "idempotent: no new nodes on second call");
         assert_eq!(edges, 0, "idempotent: no new edges on second call");
     }

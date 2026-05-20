@@ -98,19 +98,15 @@ impl ScopeConfig {
     /// - [`crate::Error::ParseError`] on invalid YAML or unsupported schema version.
     pub fn from_yaml(path: &Path) -> crate::Result<Self> {
         let raw = std::fs::read_to_string(path).map_err(crate::Error::Io)?;
-        let mut config: Self = serde_yaml_ng::from_str(&raw).map_err(|e| {
-            crate::Error::ParseError {
+        let mut config: Self =
+            serde_yaml_ng::from_str(&raw).map_err(|e| crate::Error::ParseError {
                 origin: "scope.yaml".to_string(),
                 detail: e.to_string(),
-            }
-        })?;
+            })?;
         if config.version != 1 {
             return Err(crate::Error::ParseError {
                 origin: "scope.yaml".to_string(),
-                detail: format!(
-                    "unsupported scope version: {} (expected 1)",
-                    config.version
-                ),
+                detail: format!("unsupported scope version: {} (expected 1)", config.version),
             });
         }
         config.raw_yaml = raw;
@@ -137,10 +133,7 @@ impl ScopeConfig {
         if config.version != 1 {
             return Err(crate::Error::ParseError {
                 origin: "scope_dict".to_string(),
-                detail: format!(
-                    "unsupported scope version: {} (expected 1)",
-                    config.version
-                ),
+                detail: format!("unsupported scope version: {} (expected 1)", config.version),
             });
         }
         config.raw_yaml = raw;
@@ -262,7 +255,7 @@ targets:
         match err {
             crate::Error::ParseError { detail, .. } => {
                 assert!(detail.contains("unsupported"), "got: {detail}");
-            }
+            },
             other => panic!("expected ParseError, got {other:?}"),
         }
     }
@@ -295,7 +288,7 @@ targets:
             crate::Error::ScopeViolation { target, reason } => {
                 assert_eq!(target, "evil.com");
                 assert!(reason.contains("evil.com"));
-            }
+            },
             other => panic!("expected ScopeViolation, got {other:?}"),
         }
     }
@@ -312,10 +305,7 @@ targets:
             config.validate_target("example.com.evil").is_err(),
             "suffixes must not match"
         );
-        assert!(
-            config.validate_target("").is_err(),
-            "empty must not match"
-        );
+        assert!(config.validate_target("").is_err(), "empty must not match");
     }
 
     #[test]

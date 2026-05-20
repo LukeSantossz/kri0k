@@ -21,7 +21,6 @@ def get_dummy_graph() -> dict[str, Any]:
         - edges: list of dicts with 'id', 'src', 'dst', and 'kind'
     """
 
-
 class Engagement:
     """Stateful engagement container exposed by the Rust core.
 

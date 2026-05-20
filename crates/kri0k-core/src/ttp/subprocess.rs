@@ -114,14 +114,14 @@ impl Subprocess for RealSubprocess {
             RealOutcome::Cancelled => {
                 // kill_on_drop(true) handles cleanup; returning immediately is safe.
                 Err(crate::Error::Cancelled)
-            }
+            },
             RealOutcome::TimedOut => {
                 Err(crate::Error::SubprocessTimeout {
                     ttp_id: "<subprocess>".into(),
                     // u64::try_from avoids clippy cast_possible_truncation.
                     timeout_ms: u64::try_from(timeout.as_millis()).unwrap_or(u64::MAX),
                 })
-            }
+            },
             RealOutcome::Completed(res) => {
                 let output = res.map_err(crate::Error::Io)?;
                 Ok(SubprocessOutput {
@@ -130,7 +130,7 @@ impl Subprocess for RealSubprocess {
                     stderr: String::from_utf8_lossy(&output.stderr).into_owned(),
                     exit_code: output.status.code(),
                 })
-            }
+            },
         }
     }
 }
@@ -195,7 +195,7 @@ impl Subprocess for MockSubprocess {
                     stderr: String::new(),
                     exit_code: Some(0),
                 })
-            }
+            },
             MockMode::Hanging => {
                 // Mirrors RealSubprocess select! so callers can test cancel/timeout
                 // without spawning a real process.
@@ -208,7 +208,7 @@ impl Subprocess for MockSubprocess {
                     }),
                     () = std::future::pending::<()>() => unreachable!("pending never resolves"),
                 }
-            }
+            },
         }
     }
 }
@@ -290,7 +290,12 @@ mod tests {
     async fn test_mock_subprocess_hanging_times_out() {
         let sub = MockSubprocess::hanging();
         let result = sub
-            .run("x", &[], Duration::from_millis(50), CancellationToken::new())
+            .run(
+                "x",
+                &[],
+                Duration::from_millis(50),
+                CancellationToken::new(),
+            )
             .await;
         assert!(
             matches!(result, Err(crate::Error::SubprocessTimeout { .. })),

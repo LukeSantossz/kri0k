@@ -17,11 +17,11 @@ use std::sync::{Arc, Mutex};
 use std::time::{Duration, Instant};
 
 use async_trait::async_trait;
-use tracing::instrument;
 use tokio_util::sync::CancellationToken;
+use tracing::instrument;
 
-use crate::ttp::{RateLimits, RiskLevel, Ttp, TtpOutput};
 use crate::ttp::subprocess::Subprocess;
+use crate::ttp::{RateLimits, RiskLevel, Ttp, TtpOutput};
 
 /// Structured output from a whois query (D-41, D-42).
 ///
@@ -208,32 +208,32 @@ pub fn parse_whois_output(raw: &str) -> WhoisOutput {
                 // D-42: only Registrant Organization is captured.
                 "registrant organization" => {
                     out.registrant = Some(value.to_string());
-                }
+                },
                 "registrar" => {
                     out.registrar = Some(value.to_string());
-                }
+                },
                 "name server" | "nserver" => {
                     let ns = value.to_ascii_lowercase();
                     if !out.nameservers.contains(&ns) {
                         out.nameservers.push(ns);
                     }
-                }
+                },
                 "creation date" | "created" | "created on" => {
                     out.created_at = Some(value.to_string());
-                }
+                },
                 "updated date" | "last updated" | "modified" => {
                     out.updated_at = Some(value.to_string());
-                }
+                },
                 "registry expiry date"
                 | "expiration date"
                 | "expires on"
                 | "registrar registration expiration date" => {
                     out.expires_at = Some(value.to_string());
-                }
+                },
                 _ => {
                     // D-41: unrecognised key:value lines go to raw_unparsed for inspection.
                     out.raw_unparsed.push(trimmed.to_string());
-                }
+                },
             }
         } else {
             // Lines with no ':' — banner text, TERMS OF USE paragraphs, etc.
@@ -256,8 +256,8 @@ mod tests {
     use tokio_util::sync::CancellationToken;
 
     use super::*;
-    use crate::ttp::{Ttp, TtpOutput};
     use crate::ttp::subprocess::MockSubprocess;
+    use crate::ttp::{Ttp, TtpOutput};
 
     fn fixture_path(name: &str) -> PathBuf {
         PathBuf::from(concat!(env!("CARGO_MANIFEST_DIR"), "/tests/fixtures/")).join(name)

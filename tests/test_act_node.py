@@ -98,9 +98,7 @@ async def test_act_propose_only_appends_history_d56() -> None:
     """History entry in propose_only must match D-56 shape."""
     engagement = MockEngagement()
     proposal = {"ttp_id": "T1590.001", "target": "example.com"}
-    state = _make_state(
-        engagement=engagement, propose_only=True, proposal=proposal, iteration=3
-    )
+    state = _make_state(engagement=engagement, propose_only=True, proposal=proposal, iteration=3)
     result = await act(state)
     history = result["history"]
     assert len(history) == 1

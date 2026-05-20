@@ -64,8 +64,7 @@ async def act(state: AgentState) -> dict[str, Any]:
     engagement = context.get("engagement")
     if engagement is None:
         raise RuntimeError(
-            "act: engagement missing from engagement_context "
-            "(run kri0k.engagement.create first)"
+            "act: engagement missing from engagement_context (run kri0k.engagement.create first)"
         )
 
     # D-46: dispatch to thread pool so the Tokio runtime block_on call does

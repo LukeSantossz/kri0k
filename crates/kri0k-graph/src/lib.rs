@@ -228,7 +228,10 @@ mod tests {
             name: "example.com".into(),
         };
         let value = serde_json::to_value(&kind).expect("serialize");
-        assert_eq!(value, serde_json::json!({"type": "domain", "name": "example.com"}));
+        assert_eq!(
+            value,
+            serde_json::json!({"type": "domain", "name": "example.com"})
+        );
     }
 
     #[test]
@@ -237,7 +240,10 @@ mod tests {
             name: "Example Inc.".into(),
         };
         let value = serde_json::to_value(&kind).expect("serialize");
-        assert_eq!(value, serde_json::json!({"type": "organization", "name": "Example Inc."}));
+        assert_eq!(
+            value,
+            serde_json::json!({"type": "organization", "name": "Example Inc."})
+        );
     }
 
     #[test]
@@ -246,15 +252,24 @@ mod tests {
             hostname: "ns1.example.com".into(),
         };
         let value = serde_json::to_value(&kind).expect("serialize");
-        assert_eq!(value, serde_json::json!({"type": "nameserver", "hostname": "ns1.example.com"}));
+        assert_eq!(
+            value,
+            serde_json::json!({"type": "nameserver", "hostname": "ns1.example.com"})
+        );
     }
 
     #[test]
     fn test_node_kind_deserialization_roundtrip() {
         let variants: Vec<NodeKind> = vec![
-            NodeKind::Domain { name: "example.com".into() },
-            NodeKind::Organization { name: "Example Inc.".into() },
-            NodeKind::Nameserver { hostname: "ns1.example.com".into() },
+            NodeKind::Domain {
+                name: "example.com".into(),
+            },
+            NodeKind::Organization {
+                name: "Example Inc.".into(),
+            },
+            NodeKind::Nameserver {
+                hostname: "ns1.example.com".into(),
+            },
         ];
         for kind in variants {
             let serialized = serde_json::to_value(&kind).expect("serialize");
@@ -265,7 +280,9 @@ mod tests {
 
     #[test]
     fn test_node_kind_existing_variants_still_work() {
-        let kind = NodeKind::Host { ip: "1.2.3.4".into() };
+        let kind = NodeKind::Host {
+            ip: "1.2.3.4".into(),
+        };
         let value = serde_json::to_value(&kind).expect("serialize");
         assert_eq!(value, serde_json::json!({"type": "host", "ip": "1.2.3.4"}));
     }
